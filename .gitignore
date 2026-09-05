@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+runtime/logs/
+node_modules/
+
+# local factory test fixture (nested git repo)
+factory-test/
+
+# macOS
+.DS_Store

@@ -1,0 +1,40 @@
+# ============================================================================
+# factory.defaults.yaml — TEMPLATE DEFAULTS (committed, same in every clone)
+# Do not put project-specific values here; those go in /factory.config.yaml.
+# Project config overrides anything in this file, key by key.
+# ============================================================================
+
+sandbox:
+  provider: e2b                  # swap point 1 — alt: local-docker (planned)
+  e2b:
+    template: factory-base       # built in Phase B (claude-code + pi + git + toolchain)
+    timeout_minutes: 30
+    kill_on_done: true           # fresh sandbox per step = fresh context, enforced
+
+harness:
+  provider: claude-code          # swap point 2 — alt: pi
+  claude-code:
+    command: claude
+    headless_flags: ["-p"]
+    auth_env: CLAUDE_CODE_OAUTH_TOKEN   # generated once via `claude setup-token`,
+                                        # stored in .env, injected into sandboxes only
+  pi:
+    command: pi
+    headless_flags: ["-p"]
+    # auth via provider env vars (e.g. ANTHROPIC_API_KEY) or pi /login on host
+
+models:
+  # swap point 3 — cheapest by default; bump per role only when quality demands it.
+  # harness=claude-code → `model` maps to `claude -p --model …` (provider ignored)
+  # harness=pi          → provider+model map to pi's multi-provider layer
+  default: { provider: anthropic, model: haiku }
+  roles: {}
+  # Suggested tiers once costs are known (uncomment to enable):
+  #   implementer:          { provider: anthropic, model: sonnet }
+  #   senior-developer:     { provider: anthropic, model: sonnet }
+  #   adversarial-reviewer: { provider: anthropic, model: opus }
+
+run:
+  log_dir: runtime/logs          # gitignored; one log file per role-run
+  commit_artifacts: true         # orchestrator commits each step's artifact
+  branch_prefix: feature/
