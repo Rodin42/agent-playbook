@@ -1,1 +1,27 @@
-<!doctype html><title>Agent Pipeline</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Pipeline</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="shell">
+  <div class="projsel" id="projsel">
+    <button id="projbtn" type="button"><span class="glyph">/</span><span class="pname" id="projname">…</span><span class="caret">▾</span></button>
+    <div class="menu" id="projmenu"></div>
+  </div>
+  <div class="topstrip" id="topstrip"></div>
+  <nav id="nav"></nav>
+  <main id="main"><section class="view on"><h1>loading<span class="tag">reading the repo</span></h1></section></main>
+</div>
+<div class="overlay" id="overlay"><div class="modal">
+  <div class="mhead"><b id="mtitle">detail</b><button class="x" id="mclose" type="button">×</button></div>
+  <div class="mbody" id="mbody"></div>
+  <div class="mfoot"><button class="btn" id="mcancel" type="button">close</button><button class="btn primary" id="mconfirm" type="button" hidden>confirm</button></div>
+</div></div>
+<div id="toast"></div>
+<script type="module" src="/main.js"></script>
+</body>
+</html>
