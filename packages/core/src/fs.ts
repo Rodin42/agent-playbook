@@ -65,7 +65,7 @@ export function readFrontmatter(p: string): Frontmatter | null {
 export function str(v: unknown): string | null {
   if (v === null || v === undefined) return null;
   // YAML turns unquoted timestamps into Date objects; keep them ISO, never localised
-  const s = (v instanceof Date ? v.toISOString() : String(v)).trim();
+  const s = (v instanceof Date ? v.toISOString().replace(/\.000Z$/, "Z") : String(v)).trim();
   return s === "" ? null : s;
 }
 

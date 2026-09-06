@@ -14,11 +14,11 @@
   ],
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run build --workspaces --if-present && tsc -p apps/console/client/tsconfig.json --noEmit",
     "test": "vitest run",
     "build": "npm run build --workspaces --if-present",
     "ui": "node packages/orchestrator/dist/cli.js ui --workspace apps/console/fixtures",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm run test"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",
