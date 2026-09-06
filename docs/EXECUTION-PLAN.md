@@ -25,17 +25,17 @@ context is cleared. Keep the tracker current; append decisions as they are made.
 | # | Step | Commit prefix | State |
 | --- | --- | --- | --- |
 | S0 | Reconcile docs (this file, BUILD-PLAN §2.1 vocabulary, RECONCILE-STATE, CHANGES D9, tokens, CONTEXT, templates) | — | ☑ |
-| S1 | Restructure: repo root = monorepo; playbook → `template/`; docs → `docs/`; fixture seed → `apps/console/fixtures/playbook-baseline/`; drop `front-end/`, stale files, `template/.git` | `factory: monorepo skeleton` | ☐ |
-| S2 | Workspace tooling: root `package.json` (workspaces, scripts lint/typecheck/test/build), base `tsconfig`, vitest, esbuild, minimal eslint | `factory: workspace tooling` | ☐ |
-| S3 | `packages/core`: contracts as TS types (BUILD-PLAN §2), frontmatter reader, workspace loader, feature-plan parser, artifact + station derivation, flag parser, run registry + decision log readers, pre-work checks; table-driven tests | `factory: core derivation + tests` | ☐ |
-| S4 | Fixture: `apps/console/fixtures/demo-project/` = template + 3 synthetic features in varied states + 1 finished + flags + runs + log + decisions + `fixtures/workspace.yaml` | `console: demo fixture` | ☐ |
-| S5 | `packages/orchestrator`: `factory` CLI — `ui` real, `new` real, `run/next/stop/template build` exit 2 | `factory: cli (ui, new)` | ☐ |
-| S6 | `apps/console/server`: Hono, JSON API per view, SSE via chokidar, static client, presence-only `.env` check | `console: server + SSE` | ☐ |
-| S7 | `apps/console/client`: the mockup grown up — shell, project selector, top strip, nav with live badges, every M1 view from the API, SSE refresh | `console: client M1` | ☐ |
-| S8 | M1 acceptance: run against the fixture; API smoke script; `factory new` into a temp workspace renders the A12 setup-checklist state; `rm -rf` server dir loses nothing | `console: M1 acceptance` | ☐ |
-| S9 | Monorepo CI (`.github/workflows/ci.yml`: lint, typecheck, test, build) + README | `factory: ci` | ☐ |
-| S10 | M2: feature drawer (artifact trail, tasks, questions, costs, branch/PR, runs both ways), relative times, hover paths, keyboard `g1/g2/g3`, station tooltips, mobile layout for escalation views | `console: M2` | ☐ |
-| S11 | Close-out: tracker + `docs/SESSION-2026-09-06.md`, final push, summary for the operator | `docs: close-out` | ☐ |
+| S1 | Restructure: repo root = monorepo; playbook → `template/`; docs → `docs/`; fixture seed → `apps/console/fixtures/playbook-baseline/`; drop `front-end/`, stale files, `template/.git` | `factory: monorepo skeleton` | ☑ |
+| S2 | Workspace tooling: root `package.json` (workspaces, scripts lint/typecheck/test/build), base `tsconfig`, vitest, esbuild, minimal eslint | `factory: workspace tooling` | ☑ |
+| S3 | `packages/core`: contracts as TS types (BUILD-PLAN §2), frontmatter reader, workspace loader, feature-plan parser, artifact + station derivation, flag parser, run registry + decision log readers, pre-work checks; table-driven tests | `factory: core derivation + tests` | ☑ |
+| S4 | Fixture: `apps/console/fixtures/demo-project/` = template + 3 synthetic features in varied states + 1 finished + flags + runs + log + decisions + `fixtures/workspace.yaml` | `console: demo fixture` | ☑ |
+| S5 | `packages/orchestrator`: `factory` CLI — `ui` real, `new` real, `run/next/stop/template build` exit 2 | `factory: cli (ui, new)` | ☑ |
+| S6 | `apps/console/server`: Hono, JSON API per view, SSE via chokidar, static client, presence-only `.env` check | `console: server + SSE` | ☑ |
+| S7 | `apps/console/client`: the mockup grown up — shell, project selector, top strip, nav with live badges, every M1 view from the API, SSE refresh | `console: client M1` | ☑ |
+| S8 | M1 acceptance: run against the fixture; API smoke script; `factory new` into a temp workspace renders the A12 setup-checklist state; `rm -rf` server dir loses nothing | `console: M1 acceptance` | ☑ |
+| S9 | Monorepo CI (`.github/workflows/ci.yml`: lint, typecheck, test, build) + README | `factory: ci` | ☑ |
+| S10 | M2: feature drawer (artifact trail, tasks, questions, costs, branch/PR, runs both ways), relative times, hover paths, keyboard `g1/g2/g3`, station tooltips, mobile layout for escalation views | `console: M2` | ☑ |
+| S11 | Close-out: tracker + `docs/SESSION-2026-09-06.md`, final push, summary for the operator | `docs: close-out` | ☑ |
 
 ## Architecture (fixed for this run)
 
@@ -72,7 +72,20 @@ Idea/Shaping→waiting, Ready→approved, In progress→started, Shipped/Observi
   kept minimal so `npm run lint` in CI is honest, not decorative.
 - D-05 No new status field anywhere; "pr" station reads a `pr:` frontmatter field on
   `implementation.md` (number + state) until M6 wires `gh pr view`.
-- (append below as the build proceeds)
+- D-06 No webfont download: `'JetBrains Mono', ui-monospace, …` with system fallbacks. A
+  Google Fonts request is an external call; BUILD-PLAN §0 rule 1 says no cloud.
+- D-07 The `pr` station reads `pr:` on `implementation.md` (number / `#n` / object with
+  state+url); `merged_at:` gives the finished list its date until M6 wires `gh pr view`.
+- D-08 Escalation actions render **disabled** in M1/M2 with the flag file path shown —
+  the case format is visible now, resolution stays M4 (a write + a decision-log line).
+- D-09 `strip.ciMain` is `unknown` (rendered "n/a") until M6; never faked green.
+- D-10 M2 folded into the M1 build (drawer, relative times, tooltips, keys, mobile CSS)
+  because every item was pure rendering over data M1 already derived.
+- D-11 Unpushed-commit count comes from `git rev-list @{u}..HEAD` per project; `null`
+  (no upstream / not a repo) renders nothing rather than a false zero.
+- D-12 Built M1+M2 only. M3–M6 write to project repos / run `gh` as the operator and
+  start after the operator walks the fixture journey (BUILD-PLAN §4 manual gate).
+- **Run finished 2026-09-06.** 14 commits, 62 tests, lint/typecheck/build green, CI added.
 
 ## Resume prompt (paste this if context was cleared)
 

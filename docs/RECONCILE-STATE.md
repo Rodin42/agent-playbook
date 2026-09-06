@@ -8,7 +8,7 @@ open questions: Q1 unified vocabulary (BUILD-PLAN §2.1) · Q3 keep
 `Rodin42/agent-playbook` as the remote (renaming it to `agent-pipeline` on GitHub is a
 one-click operator to-do; `gh` on this Mac is the work account) · Q4 the mockup is the
 spec · Q9 `Rodin42` · Q10 `factory-test/` seeds the fixture · Q11/Q13 fixture first,
-`factory new` last in M1. Execution record: `docs/EXECUTION-PLAN.md`.
+`factory new` last in M1. Execution record: `docs/EXECUTION-PLAN.md`. **Executed 2026-09-06 — see `docs/SESSION-2026-09-06.md`.**
 
 ---
 
