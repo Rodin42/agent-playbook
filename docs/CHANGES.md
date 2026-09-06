@@ -4,7 +4,7 @@ You (Claude Code) started building from an earlier BUILD-PLAN. The decisions bel
 made after that. **Reconcile — do not start fresh.** Follow the procedure at the bottom.
 
 ## D1 · Monorepo (new)
-The product is one private GitHub repo, `agent-pipeline`, npm workspaces:
+The product is one private GitHub repo, `agent-playbook` (operator's decision 2026-09-06: one name for everything; the handover called it `agent-pipeline`), npm workspaces:
 `apps/console` (@factory/console) · `packages/core` (@factory/core: frontmatter
 reader, status derivation, the data contracts of BUILD-PLAN §2 as TS types) ·
 `packages/orchestrator` (@factory/orchestrator: the `factory` CLI) · `template/`
@@ -69,7 +69,7 @@ corrections the handover had regressed (pi was described as template default whi
 `factory.defaults.yaml` ships claude-code), a unified artifact status vocabulary
 (BUILD-PLAN §2.1), the fixture seed and the research docs. The embedded `template/.git`
 (a clone of the retired work repo) was removed. Repo: `Rodin42/agent-playbook` stays
-the remote (rename to `agent-pipeline` on GitHub is an operator to-do). Full record:
+the remote (the operator chose to keep that name for everything). Full record:
 `docs/RECONCILE-STATE.md`.
 
 ---

@@ -54,19 +54,19 @@ channel between agents.
    mirroring substrate Commands, required by branch protection; PR template in
    `.github/`. Commit prefixes: `factory:` / `console:` + `Factory-Role:` trailer.
 
-8. **Console (Agent Pipeline):** generic multi-project operator console, e2b-style
+8. **Console (agent-playbook):** generic multi-project operator console, e2b-style
    dark terminal design. Nav = General + the three steps, each with its own
    "Escalation to human" and "Runs & audit". Task lifecycle waiting → approved →
    started → finished maps onto the existing feature-plan statuses (no new field);
    finished = merged. Editing allowed only for waiting/approved tasks; .env never
    passes through the console; every console action = `console:` git commit + decision
-   log. Full spec lives in the agent-pipeline monorepo: docs/BUILD-PLAN.md
+   log. Full spec lives in the agent-playbook monorepo: docs/BUILD-PLAN.md
    (+ ux-review.md, frontend-design.md, agent-pipeline-ui.html as visual spec).
    Build order M1→M6; merge action last.
 
 9. **Stack & repo model (final):** Node 22 + TypeScript everywhere, npm workspaces,
    Hono server, vanilla TS client, **no database** — all state is committed files;
-   only `runtime/logs/` stays local. The **agent-pipeline monorepo** (private GitHub
+   only `runtime/logs/` stays local. The **agent-playbook monorepo** (private GitHub
    repo) is the product: apps/console, packages/core (@factory/core),
    packages/orchestrator (@factory/orchestrator), template/ (THE canonical playbook —
    this file's home), docs/. Managed codebases are separate repos in

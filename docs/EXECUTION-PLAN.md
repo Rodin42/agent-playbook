@@ -40,7 +40,7 @@ context is cleared. Keep the tracker current; append decisions as they are made.
 ## Architecture (fixed for this run)
 
 ```
-agent-pipeline/
+agent-playbook/
 ├── package.json                 npm workspaces: apps/*, packages/*
 ├── tsconfig.base.json
 ├── apps/console/
@@ -63,8 +63,8 @@ decisions). Console task status = feature-plan `Status:` column mapped
 Idea/Shaping→waiting, Ready→approved, In progress→started, Shipped/Observing→finished.
 
 ## Decisions taken during the run
-- D-01 Repo stays `Rodin42/agent-playbook` on GitHub (rename is an operator click); the
-  monorepo's name in `package.json` is `agent-pipeline`.
+- D-01 Repo is `Rodin42/agent-playbook`; the operator chose that name for everything
+  (2026-09-06), so `package.json`, docs and the console title say agent-playbook too.
 - D-02 Vocabulary: six discovery artifacts `draft | in-review | final | superseded`;
   `implementation.md` unchanged. Written into the templates and `features/README.md`.
 - D-03 The mockup's hardcoded `rodin/…` remotes become `Rodin42/…`.
@@ -90,7 +90,7 @@ Idea/Shaping→waiting, Ready→approved, In progress→started, Shipped/Observi
 ## Resume prompt (paste this if context was cleared)
 
 ```
-Continue the agent-pipeline build. Read, in order: docs/CHANGES.md,
+Continue the agent-playbook build. Read, in order: docs/CHANGES.md,
 docs/BUILD-PLAN.md, docs/RECONCILE-STATE.md, docs/EXECUTION-PLAN.md. Then run
 `git log --oneline -15` and `git status`. Continue from the first step in the
 EXECUTION-PLAN tracker that is not ☑, honouring its operating rules: autonomous, no

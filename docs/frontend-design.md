@@ -1,4 +1,4 @@
-# Agent Pipeline — Frontend Design & Architecture (v2)
+# agent-playbook console — Frontend Design & Architecture (v2)
 
 The operator console for the factory — generic across projects (selector upper-left,
 one project active at a time). Companion to `agent-pipeline-ui.html` (open in a browser;

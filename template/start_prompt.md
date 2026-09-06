@@ -36,7 +36,7 @@ ground rules for the whole session:
 
 ### Stage 1 · Install the playbook
 
-> If this project was seeded with `factory new <name>` from the agent-pipeline
+> If this project was seeded with `factory new <name>` from the agent-playbook
 > monorepo, Stage 1 is already done — verify the files listed below are present and
 > committed, then continue at Stage 2.
 

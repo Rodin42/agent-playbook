@@ -1,4 +1,4 @@
-/* Agent Pipeline console — tokens and rules from docs/agent-pipeline-ui.html (the visual spec).
+/* agent-playbook console — tokens and rules from docs/agent-pipeline-ui.html (the visual spec).
    Font: JetBrains Mono if installed; no webfont download — the console makes no external requests (BUILD-PLAN §0 rule 1). */
 :root{
   --bg:#0D0D0C; --panel:#141413; --panel2:#1A1A19; --line:#262624; --line2:#333330;

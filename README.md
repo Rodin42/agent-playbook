@@ -1,4 +1,4 @@
-# agent-pipeline
+# agent-playbook
 
 The agent factory: a three-phase, artifact-driven software pipeline run by AI agents
 with a human at the irreversible gates — plus the operator console that renders it.

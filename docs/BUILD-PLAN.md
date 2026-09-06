@@ -1,4 +1,4 @@
-# BUILD PLAN — Agent Pipeline Console (hand-over to Claude Code)
+# BUILD PLAN — agent-playbook Console (hand-over to Claude Code)
 
 Everything needed to build the console for real. Read together with, in this order:
 `docs/CHANGES.md` (decision deltas — read FIRST if reconciling) · `docs/ux-review.md`
@@ -51,7 +51,7 @@ Hard rules (violating any of these is a wrong build, however nice it looks):
 ## 1.5 · Repo layout — monorepo product, workspace of project repos
 
 ```
-agent-pipeline/                  # THE monorepo (github.com/<owner>/agent-pipeline, private)
+agent-playbook/                  # THE monorepo (github.com/Rodin42/agent-playbook, private)
 ├── package.json                 # npm workspaces
 ├── Dockerfile                   # optional: run identically on any container host
 ├── workspace.yaml.example
