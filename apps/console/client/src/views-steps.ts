@@ -14,7 +14,11 @@ function wireRows(d: ProjectView): void {
     const id = el.dataset.fid as string;
     const entry = d.backlog.find((e) => e.id === id) ?? null;
     const p = d.pipeline.find((x) => x.id === id) ?? null;
-    if (!entry) return;
+    if (!entry) {
+      const f = d.finished.find((x) => x.id === id);
+      if (f) openModal(`${f.id} — ${f.name}`, `<div class="kv"><span>status</span><b>finished · merged</b><span>folder</span><b>phase-2-implementation/${esc(f.folder ?? "")}</b><span>merged</span><b>${esc(f.mergedAt ?? "—")}</b><span>PR</span><b>${f.pr.number ? `#${f.pr.number}` : "—"}</b><span>cost</span><b>${usd(f.costUsd)}</b></div>`);
+      return;
+    }
     const { title, body } = featureDrawer(d, entry, p);
     openModal(title, body);
   })));
@@ -70,7 +74,8 @@ function runRow(r: RunRecord, go: (v: ViewId) => void): string {
   const status = r.status === "running" ? chip("running", "grn") : r.status === "ok" ? chip("ok", "grn") : r.status === "failed" ? chip("failed", "red") : r.status === "escalated" ? chip("escalated", "org") : chip("stopped", "red");
   const act = r.status === "escalated" ? `<button type="button" class="btn" data-go="s${r.step}-esc">open case</button>` : r.logPath ? `<button type="button" class="btn" data-log="${esc(r.id)}">log</button>` : "";
   queueMicrotask(() => document.querySelectorAll<HTMLButtonElement>(`[data-go="s${r.step}-esc"]`).forEach((b) => b.addEventListener("click", () => go(b.dataset.go as ViewId))));
-  return `<div class="runrow"><div><b>${esc(r.feature ?? "—")} · ${esc(r.role)}</b><div class="r2">${rel(r.started)} · ${esc(r.harness)} / ${esc(r.model)}${r.sandbox ? ` · ${esc(r.sandbox)}` : ""}${r.reason ? ` · ${esc(r.reason)}` : ""}</div></div><div>${status}</div><div>${dur(r.durationSec)}</div><div>${usd(r.cost_usd)}</div><div>${act}</div></div>`;
+  const feat = r.feature ? `<span data-fid="${esc(r.feature)}" style="cursor:pointer" title="open the feature drawer">${esc(r.feature)}</span>` : "—";
+  return `<div class="runrow"><div><b>${feat} · ${esc(r.role)}</b><div class="r2">${rel(r.started)} · ${esc(r.harness)} / ${esc(r.model)}${r.sandbox ? ` · ${esc(r.sandbox)}` : ""}${r.reason ? ` · ${esc(r.reason)}` : ""}</div></div><div>${status}</div><div>${dur(r.durationSec)}</div><div>${usd(r.cost_usd)}</div><div>${act}</div></div>`;
 }
 
 function auditTable(rows: Decision[]): string {
@@ -84,6 +89,7 @@ export function runs(d: ProjectView, step: Step, go: (v: ViewId) => void): strin
   const recent = rs.filter((r) => r.status !== "running").slice(0, 12);
   const decisions = d.decisions.filter((x) => x.step === step);
   const cost = d.strip.cost;
+  wireRows(d);
   queueMicrotask(async () => {
     document.querySelectorAll<HTMLButtonElement>("[data-log]").forEach((b) => b.addEventListener("click", async () => {
       const r = await api.log(d.ref.name, b.dataset.log as string, 200);
