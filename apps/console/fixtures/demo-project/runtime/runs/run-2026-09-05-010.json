@@ -1,0 +1,18 @@
+{
+  "id": "run-2026-09-05-010",
+  "feature": "F-004",
+  "role": "pre-pull-request-qa",
+  "step": 2,
+  "harness": "claude-code",
+  "model": "haiku",
+  "sandbox": "e2b-77ab",
+  "started": "2026-09-05T15:20:00Z",
+  "ended": "2026-09-05T15:41:00Z",
+  "status": "ok",
+  "cost_usd": 0.06,
+  "tokens": {
+    "in": 22000,
+    "out": 4000
+  },
+  "reason": null
+}

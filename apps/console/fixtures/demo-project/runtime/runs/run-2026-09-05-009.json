@@ -1,0 +1,18 @@
+{
+  "id": "run-2026-09-05-009",
+  "feature": "F-004",
+  "role": "adversarial-reviewer",
+  "step": 2,
+  "harness": "claude-code",
+  "model": "opus",
+  "sandbox": "e2b-41de",
+  "started": "2026-09-05T14:30:00Z",
+  "ended": "2026-09-05T15:02:00Z",
+  "status": "ok",
+  "cost_usd": 2.0,
+  "tokens": {
+    "in": 51000,
+    "out": 8000
+  },
+  "reason": null
+}

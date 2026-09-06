@@ -1,0 +1,8 @@
+# fixture workspace — two projects: one mid-flight, one freshly seeded (A12 setup state)
+projects:
+  - name: jbr-factory
+    path: ./demo-project
+    remote: git@github.com:Rodin42/jbr-factory.git
+  - name: aurora-crm
+    path: ./aurora-crm
+    remote: git@github.com:Rodin42/aurora-crm.git

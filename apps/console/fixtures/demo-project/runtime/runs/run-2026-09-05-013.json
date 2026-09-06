@@ -1,0 +1,18 @@
+{
+  "id": "run-2026-09-05-013",
+  "feature": "F-010",
+  "role": "rodin-twin",
+  "step": 1,
+  "harness": "claude-code",
+  "model": "haiku",
+  "sandbox": null,
+  "started": "2026-09-05T16:40:00Z",
+  "ended": "2026-09-05T16:40:19Z",
+  "status": "escalated",
+  "cost_usd": 0.01,
+  "tokens": {
+    "in": 3100,
+    "out": 600
+  },
+  "reason": "high-stakes intake \u2192 flag-2026-09-05-0009"
+}

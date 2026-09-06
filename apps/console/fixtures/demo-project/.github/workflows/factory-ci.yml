@@ -1,0 +1,20 @@
+# Factory CI — runs the full local check on every PR and every push to main.
+# The commands MUST mirror substrate.md §6 (Commands). Update both together.
+name: factory-ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  full-local-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4          # swap for your stack per substrate.md
+        with: { node-version: 22, cache: npm }
+      - run: npm ci                          # install
+      - run: npm run lint                    # lint
+      - run: npm run typecheck               # typecheck
+      - run: npm test                        # test
+      - run: npm run build                   # build
+# Branch protection on main must REQUIRE this job green before merge.

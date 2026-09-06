@@ -1,0 +1,18 @@
+{
+  "id": "run-2026-09-05-008",
+  "feature": "F-006",
+  "role": "senior-developer",
+  "step": 2,
+  "harness": "claude-code",
+  "model": "sonnet",
+  "sandbox": "e2b-08fa",
+  "started": "2026-09-05T08:40:00Z",
+  "ended": "2026-09-05T09:12:00Z",
+  "status": "escalated",
+  "cost_usd": 0.31,
+  "tokens": {
+    "in": 30000,
+    "out": 6000
+  },
+  "reason": "red line: new dependency \u2192 flag-2026-09-05-0007"
+}

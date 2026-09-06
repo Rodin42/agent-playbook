@@ -1,0 +1,18 @@
+{
+  "id": "run-2026-08-28-003",
+  "feature": "F-003",
+  "role": "promoter",
+  "step": 2,
+  "harness": "claude-code",
+  "model": "haiku",
+  "sandbox": "e2b-55cc",
+  "started": "2026-08-28T08:40:00Z",
+  "ended": "2026-08-28T08:46:00Z",
+  "status": "ok",
+  "cost_usd": 0.02,
+  "tokens": {
+    "in": 7000,
+    "out": 1400
+  },
+  "reason": null
+}

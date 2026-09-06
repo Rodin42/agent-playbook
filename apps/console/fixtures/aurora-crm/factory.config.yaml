@@ -1,0 +1,20 @@
+# ============================================================================
+# factory.config.yaml — PROJECT CONFIG (committed, unique per clone)
+# Filled during setup (start_prompt.md). Overrides runtime/factory.defaults.yaml.
+# Rule: anything that differs between two projects lives HERE. Secrets live in .env.
+# ============================================================================
+
+project:
+  name: "<project-name>"
+  repo: "<git remote url>"
+  main_branch: main
+
+# Uncomment only to override a default:
+# sandbox:
+#   e2b: { template: "<custom template id>", timeout_minutes: 45 }
+# harness:
+#   provider: pi                 # ← the one-line LLM/harness switch
+# models:
+#   default: { provider: anthropic, model: haiku }
+#   roles:
+#     implementer: { provider: anthropic, model: sonnet }

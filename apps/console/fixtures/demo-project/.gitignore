@@ -1,0 +1,5 @@
+# fixture: logs are committed on purpose so the console has something to tail
+.env
+.env.*
+!.env.example
+node_modules/

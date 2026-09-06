@@ -229,7 +229,7 @@ through the console.
 - Integration: a fixture project at `apps/console/fixtures/demo-project/` (copy of the
   playbook + 3 synthetic features in varied states + flags + runs + a decision log)
   that M1 must render pixel-plausibly; CI runs the derivation suite on it. Its
-  `feature-plan.md` entry F-001 is the real 2026-09-05 factory-test output
+  `feature-plan.md` entry F-007 is the real 2026-09-05 factory-test output
   (`fixtures/playbook-baseline/test-entry.md`), so one entry is model-authored.
 - Manual gate per milestone: the operator walks the affected journey on the fixture
   before the milestone is called done.

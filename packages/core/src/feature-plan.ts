@@ -139,7 +139,7 @@ export function parseFeaturePlan(text: string): FeatureEntry[] {
       field = key;
       if (!key) return;
       if (key === "openQuestions") {
-        if (value && !hasPlaceholder(value) && !/^the async queue/i.test(value)) {
+        if (value && !hasPlaceholder(value) && !/^the async queue/i.test(value) && !/^[-—–]+$|^none$/i.test(value)) {
           cur.openQuestions.push({ text: value, answered: isAnswered(value) });
         }
       } else if (key === "planStatus") {

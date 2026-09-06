@@ -1,0 +1,19 @@
+# factory.config.yaml — PROJECT CONFIG for the demo fixture (jbr-factory)
+project:
+  name: "jbr-factory"
+  repo: "git@github.com:Rodin42/jbr-factory.git"
+  main_branch: main
+
+models:
+  roles:
+    implementer:          { provider: anthropic, model: sonnet }
+    senior-developer:     { provider: anthropic, model: sonnet }
+    adversarial-reviewer: { provider: anthropic, model: opus }
+    pre-pull-request-qa:  { provider: anthropic, model: haiku }
+
+console:
+  run_mode: manual
+  paused: false
+  max_concurrent_sandboxes: 2
+  budget_monthly_usd: 100
+  notify: { kind: none, url: "" }

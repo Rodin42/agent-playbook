@@ -1,0 +1,6 @@
+{"at": "2026-08-28T12:04:00Z", "actor": "operator", "action": "merge PR #54", "subject": "F-003 user roles & permissions", "rule": null, "step": 2}
+{"at": "2026-09-02T09:12:00Z", "actor": "rodin-twin", "action": "intake marked twin-checked", "subject": "F-007", "rule": "checkpoint 1 \u2014 complete entry, silent pass", "step": 1}
+{"at": "2026-09-05T07:12:00Z", "actor": "rodin-twin", "action": "breakdown approved", "subject": "F-005 (3 tasks, no red-line contact)", "rule": "routine breakdown within mandate", "step": 2}
+{"at": "2026-09-05T07:40:00Z", "actor": "rodin-twin", "action": "masterplan authored", "subject": "F-005", "rule": "twin authors each feature's masterplan", "step": 2}
+{"at": "2026-09-05T14:08:00Z", "actor": "rodin-twin", "action": "gap questions drafted, operator flagged", "subject": "F-008 / F-009", "rule": "checkpoint 1 \u2014 twin never guesses product intent", "step": 1}
+{"at": "2026-09-05T16:05:00Z", "actor": "rodin-twin", "action": "PR #61 opened", "subject": "F-004, all gates green", "rule": "may open PR when gates green; merge reserved", "step": 2}

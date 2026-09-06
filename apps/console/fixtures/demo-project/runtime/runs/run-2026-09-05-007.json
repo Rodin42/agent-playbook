@@ -1,0 +1,18 @@
+{
+  "id": "run-2026-09-05-007",
+  "feature": "F-005",
+  "role": "rodin-twin",
+  "step": 2,
+  "harness": "claude-code",
+  "model": "haiku",
+  "sandbox": "e2b-1a2b",
+  "started": "2026-09-05T07:30:00Z",
+  "ended": "2026-09-05T07:40:00Z",
+  "status": "ok",
+  "cost_usd": 0.03,
+  "tokens": {
+    "in": 8000,
+    "out": 2500
+  },
+  "reason": null
+}

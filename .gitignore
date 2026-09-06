@@ -7,3 +7,4 @@ dist/
 .DS_Store
 *.tsbuildinfo
 apps/console/client/dist/
+!apps/console/fixtures/**/*.log

@@ -1,0 +1,18 @@
+{
+  "id": "run-2026-09-05-012",
+  "feature": "F-009",
+  "role": "product-strategist",
+  "step": 1,
+  "harness": "claude-code",
+  "model": "haiku",
+  "sandbox": null,
+  "started": "2026-09-05T14:02:00Z",
+  "ended": "2026-09-05T14:08:11Z",
+  "status": "ok",
+  "cost_usd": 0.04,
+  "tokens": {
+    "in": 9800,
+    "out": 2100
+  },
+  "reason": null
+}
