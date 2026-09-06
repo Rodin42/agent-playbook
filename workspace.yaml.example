@@ -1,0 +1,10 @@
+# workspace.yaml — registry of codebases the console manages.
+# Copy to ~/factory-workspace/workspace.yaml (or pass --workspace <path>).
+# Paths are relative to this file. Each project is its own git repo.
+projects:
+  - name: jbr-factory
+    path: ./jbr-factory
+    remote: git@github.com:Rodin42/jbr-factory.git
+  # - name: aurora-crm
+  #   path: ./aurora-crm
+  #   remote: git@github.com:Rodin42/aurora-crm.git
