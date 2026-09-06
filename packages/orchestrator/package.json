@@ -1,0 +1,20 @@
+{
+  "name": "@factory/orchestrator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The factory CLI: new · run · next · stop · ui · template build.",
+  "bin": {
+    "factory": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@factory/console": "^0.1.0",
+    "@factory/core": "^0.1.0"
+  }
+}

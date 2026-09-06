@@ -1,0 +1,25 @@
+{
+  "name": "@factory/console",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The operator console: Hono server (derives everything from the repo, SSE) + vanilla TS client.",
+  "main": "./dist/server/index.js",
+  "types": "./dist/server/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node build-client.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p client/tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@factory/core": "^0.1.0",
+    "@hono/node-server": "^2.1.1",
+    "chokidar": "^5.0.0",
+    "hono": "^4.13.7"
+  }
+}

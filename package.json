@@ -1,0 +1,31 @@
+{
+  "name": "agent-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The agent factory: three-phase artifact-driven pipeline + the operator console that renders it.",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/core",
+    "apps/console",
+    "packages/orchestrator"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "build": "npm run build --workspaces --if-present",
+    "ui": "node packages/orchestrator/dist/cli.js ui --workspace apps/console/fixtures",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.10.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.69.0",
+    "vitest": "^5.0.0"
+  }
+}
