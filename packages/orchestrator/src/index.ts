@@ -1,1 +1,1 @@
-export const ORCHESTRATOR_VERSION = "0.1.0";
+export { factoryNew, TEMPLATE_DIR, type NewOptions } from "./new.js";
