@@ -28,8 +28,10 @@ ground rules for the whole session:
 
 ### Stage 0 · Preconditions
 
-1. Confirm you have: (a) this repository checked out on a fresh branch
-   `factory-setup`, (b) the playbook folder or zip, (c) the operator present.
+1. Confirm you have: (a) this repository checked out, on a fresh branch
+   `factory-setup` created from `main` (`factory new` leaves you on `main` — create the
+   branch now; setup commits go there and the operator merges at the end), (b) the
+   playbook folder or zip, (c) the operator present.
 2. Detect whether this is a **new/empty** codebase or an **existing** one — it changes
    Stage 3.
 3. Confirm git works and the working tree is clean. If not, stop and report.
@@ -80,7 +82,11 @@ ground rules for the whole session:
    test / run locally: find the command, **run it**, record it with a one-line "healthy
    output looks like". If one is missing or broken, record it as missing and add a
    proposed fix to the open questions — do not fake it. State clearly: the full local
-   check = lint + typecheck + test + build, all green.
+   check = lint + typecheck + test + build, all green. Expose every command as a target
+   in the root `Makefile` (shipped with placeholder targets that fail) — CI and agents
+   call those targets, never the raw commands — and list the machine prerequisites
+   (Docker, `uv`, `node`, …) under the table. Install missing prerequisites with the
+   operator's consent and record how.
 4. **Red lines**: start from the four in the twin (no new dependency without ADR; no
    PII/secrets in logs or code; no merge with red CI; agents never touch prod data),
    ask the operator for project-specific additions (compliance, rate limits, forbidden
@@ -91,7 +97,8 @@ ground rules for the whole session:
 1. Interview the operator for the stack; propose defaults where they have no opinion.
 2. Scaffold the minimal skeleton so the Commands section is *true*: init the project,
    add lint/typecheck/test/build tooling, one passing placeholder test. Run everything.
-3. Fill the same substrate sections from what was actually created.
+3. Fill the same substrate sections from what was actually created, including the
+   Repo layout table and §8 Environments.
 
 Commit: `factory: substrate filled and verified`.
 
@@ -110,7 +117,9 @@ Commit: `factory: substrate filled and verified`.
 
 ### Stage 5 · The project brief and the feature plan
 
-0. Fill `phase-1-product-development/project-brief.md` with the operator (or the PO if
+0. Documents the operator or a PO supplies (a spec, mockups, references) go into
+   `docs/` at the repo root, committed — never loose at the root or in ad-hoc folders.
+   Fill `phase-1-product-development/project-brief.md` with the operator (or the PO if
    present): why the product exists, who for, what "good" means, product-level
    non-goals, standing constraints. Plain words, under a page — the strategists and the
    twin read it before every pass.
@@ -128,7 +137,8 @@ Commit: `factory: substrate filled and verified`.
 
 1. Fill `factory.config.yaml` from what Stages 3–4 established: project name, git
    remote, main branch. Do not duplicate defaults — only override what differs.
-2. Copy `.env.example` to `.env`. Ask the operator to run `claude setup-token` on their
+2. Copy `.env.example` to `.env` (the factory's env; the application keeps its own env
+   file next to its code, e.g. `apps/backend/.env`). Ask the operator to run `claude setup-token` on their
    own machine (browser flow) and paste the token into `CLAUDE_CODE_OAUTH_TOKEN`; ask
    them to add `E2B_API_KEY` from the e2b dashboard. Never echo these values back.
 3. Verify `.env` is gitignored (`git check-ignore .env` must succeed) BEFORE the
@@ -170,9 +180,9 @@ If the operator wants the executable layer now (they may prefer to run manually 
 3. Confirm `.gitignore` / secret scanning basics; verify no secrets are currently
    committed (report, don't fix silently). Ask the operator to enable GitHub **secret
    scanning + push protection** on the repo.
-4. Verify `.github/workflows/factory-ci.yml` is installed and its steps mirror
-   `substrate.md` §6 Commands — update the workflow if the substrate uses different
-   commands. Branch protection must require this job.
+4. Verify `.github/workflows/factory-ci.yml` is installed: it calls the root `Makefile`
+   targets, so add the toolchain setup steps and services (database, …) your stack needs
+   and confirm the targets mirror `substrate.md` §6. Branch protection must require this job.
 5. Sandbox push auth: ask the operator to create a fine-grained PAT (this repo only;
    contents read/write + pull-requests write; no admin) and put it in `.env` as
    `GITHUB_TOKEN`. State the rule out loud: *sandboxes push feature branches and open

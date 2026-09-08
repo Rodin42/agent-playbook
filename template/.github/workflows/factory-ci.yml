@@ -1,5 +1,6 @@
 # Factory CI — runs the full local check on every PR and every push to main.
-# The commands MUST mirror substrate.md §6 (Commands). Update both together.
+# It calls the root Makefile targets, which MUST mirror substrate.md §6 (Commands).
+# Add toolchain setup steps and services (database, etc.) for YOUR stack below.
 name: factory-ci
 on:
   pull_request:
@@ -8,13 +9,21 @@ on:
 jobs:
   full-local-check:
     runs-on: ubuntu-latest
+    # services:                               # example: a database the tests need
+    #   postgres:
+    #     image: postgres:17
+    #     env: { POSTGRES_USER: app, POSTGRES_PASSWORD: app, POSTGRES_DB: app }
+    #     ports: ["5432:5432"]
+    #     options: --health-cmd "pg_isready -U app" --health-interval 2s --health-retries 30
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4          # swap for your stack per substrate.md
-        with: { node-version: 22, cache: npm }
-      - run: npm ci                          # install
-      - run: npm run lint                    # lint
-      - run: npm run typecheck               # typecheck
-      - run: npm test                        # test
-      - run: npm run build                   # build
+      # - uses: actions/setup-node@v4          # example: Node toolchain
+      #   with: { node-version: 22, cache: npm }
+      # - uses: astral-sh/setup-uv@v6          # example: Python toolchain via uv
+      #   with: { python-version: "3.13" }
+      - run: make install
+      - run: make lint
+      - run: make typecheck
+      - run: make test
+      - run: make build
 # Branch protection on main must REQUIRE this job green before merge.
