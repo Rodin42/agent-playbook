@@ -3,3 +3,4 @@
 !.env.example
 runtime/logs/
 node_modules/
+.DS_Store
