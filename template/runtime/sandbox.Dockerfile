@@ -10,5 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends git make curl c
 RUN npm install -g @anthropic-ai/claude-code \
     && npm install -g @earendil-works/pi-coding-agent --ignore-scripts
 # --- project toolchain below this line (examples) -----------------------------------------
-# RUN curl -LsSf https://astral.sh/uv/install.sh | sh && mv /root/.local/bin/uv /usr/local/bin/uv   # Python via uv
+# Python via uv (system-wide, visible to the sandbox `user`):
+# RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh \
+#     && uv python install 3.13 --install-dir /opt/uv/python && chmod -R a+rX /opt/uv \
+#     && ln -s "$(ls -d /opt/uv/python/cpython-3.13.*-linux-x86_64-gnu | head -1)/bin/python3.13" /usr/local/bin/python3.13
 # RUN apt-get update && apt-get install -y postgresql-17                                              # a database the tests need

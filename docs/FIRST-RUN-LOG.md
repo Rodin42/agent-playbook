@@ -20,6 +20,12 @@ Raw material for the user manual (goal 2 of the run).
 | D-011 | Stage 3 | Machine prerequisites (Docker, `uv`, …) are nowhere listed; `uv` was missing on the operator's machine | start_prompt 3.3 + substrate §6 now list prerequisites; manual needs a prerequisites page | fixed 2026-09-08 |
 | D-012 | Stage 3 | Two toolchains in one repo need one command contract; raw commands in CI and role docs diverge | root `Makefile` is the contract (see D-001) | fixed 2026-09-08 |
 
+| D-013 | Track B | `npm i -g @anthropic-ai/claude-code --ignore-scripts` leaves Claude Code without its native binary; the postinstall must run. pi is the one that needs `--ignore-scripts` | `template/runtime/sandbox.Dockerfile` | fixed 2026-09-09 |
+| D-014 | Track B | Dockerfile `ENV` values are not present in the sandbox command environment; anything the runtime needs must be on PATH or in a file | `template/runtime/sandbox.Dockerfile` (symlink python3.13 into /usr/local/bin) | fixed 2026-09-09 |
+| D-015 | Track B | e2b sandboxes have no Docker, so `make test` (compose Postgres) cannot run where the implementer runs — the full local check is not executable in a sandbox yet | IMPROVEMENTS B3 | open |
+| D-016 | Track B | The console reads the operator's working tree; sandbox commits land on `origin/feature/*` — invisible until a checkout | IMPROVEMENTS A7 | open |
+| D-017 | Stage 8 | A fine-grained PAT is bound to its resource owner: moving the repo into an organization killed it; a collaborator cannot issue one for a repo they do not own | user manual (token page) | documented |
+
 ## Decisions taken by the operator during the run
 - 2026-09-08: no auth in v0; ontology version nullable at ingest; feedback panel (spec
   §12.6 / C.3) deferred; Postgres via compose locally and a service in CI; Step 3 runs
