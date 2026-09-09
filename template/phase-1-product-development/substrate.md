@@ -109,5 +109,6 @@ What exists, and what agents may touch in each. "Does not exist yet" is a valid 
 | --- | --- | --- |
 | local | `<...>` | everything |
 | CI | `<...>` | read-only; runs the full local check |
+| sandbox | the factory image (`runtime/sandbox.Dockerfile`) | everything inside it; must be able to run `make check` — services the tests need live in the image |
 | staging | `<...>` | `<...>` |
 | prod | `<...>` | never — data included |
