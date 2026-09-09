@@ -29,6 +29,9 @@ Raw material for the user manual (goal 2 of the run).
 | D-018 | Track B | `factory template build` reads `runtime/sandbox.Dockerfile` from the operator's working tree, so a Dockerfile committed on a branch is not what gets built until that branch is checked out. Same for `runtime/steps.yaml`, which `factory run` reads locally | orchestrator: read both from the feature branch in the sandbox instead (IMPROVEMENTS B8) | open |
 | D-019 | A1 | The twin doc is self-authored, yet the run-step contract needed a mechanics block in it. The block was added to the template and mirrored; the operator must review it in their own voice | PR 2 note; user manual | documented |
 
+| D-020 | chain | Local run records written into `runtime/runs/` were swept into an unrelated commit by `git add -A` and then conflicted with the sandbox's committed copy | orchestrator writes locally to `.factory/runs/`; core merges all sources | fixed 2026-09-10 |
+| D-021 | chain | The feature worktree lagged one commit: it was reset to `origin/<branch>` without fetching that ref first | orchestrator fetches `origin <branch>` before the reset | fixed 2026-09-10 |
+
 ## Decisions taken by the operator during the run
 - 2026-09-08: no auth in v0; ontology version nullable at ingest; feedback panel (spec
   §12.6 / C.3) deferred; Postgres via compose locally and a service in CI; Step 3 runs

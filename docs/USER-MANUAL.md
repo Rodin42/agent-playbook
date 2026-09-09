@@ -157,8 +157,11 @@ factory run promoter <slug>            # opens the PR — you merge
 Each run prints the sandbox id, the prompt size, the harness cost, the verdict against
 `runtime/steps.yaml`, and the commit it pushed. Exit code 0 = ok, 3 = failed (the reason
 is in the log), 4 = escalated (the twin wrote a flag in `runtime/flags/` and needs you).
-Run records land in `runtime/runs/`, logs in `runtime/logs/`, and a worktree per feature
-under `.factory/worktrees/<slug>/` so the console sees the branch.
+Run records are committed by the sandbox into `runtime/runs/` on the feature branch; the
+orchestrator's own copy (including running and failed runs) is `.factory/runs/`, logs are
+`runtime/logs/`, and a worktree per feature sits under `.factory/worktrees/<slug>/` so the
+console sees the branch tip. `.factory/` is gitignored. Do not `git add -A` in the project
+checkout while runs are in flight — commit named files.
 
 The first real run (product-strategist, haiku) cost $0.28 and took 4½ minutes.
 
