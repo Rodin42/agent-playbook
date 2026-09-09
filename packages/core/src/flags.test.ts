@@ -65,3 +65,11 @@ describe("parseFlag (BUILD-PLAN §2.2)", () => {
     expect(f.step).toBe(2);
   });
 });
+
+describe("flag stays open until a real Decision section exists", () => {
+  it("does not treat 'Decisions needed' as a decision", () => {
+    const f = parseFlag("---\nid: f1\ntype: sign-off\nstatus: open\n---\n## Question\nq\n## Decisions needed (blocking)\n- PO: yes or no\n", "runtime/flags/f1.md");
+    expect(f?.status).toBe("open");
+    expect(f?.decision).toBeNull();
+  });
+});

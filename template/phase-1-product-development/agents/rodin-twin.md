@@ -85,6 +85,27 @@ The prompt you receive is this doc plus your `reads:` files plus a step instruct
 `feature/<slug>` in the current directory. Read the four discovery docs. If they hold together and respect my red lines: set each of them to
 `status: final`, write `features/<slug>/masterplan.md` with `status: final`, and move the plan entry to **Ready**.
 If something needs me: leave the masterplan `draft`, write one flag `runtime/flags/flag-YYYYMMDDTHHMMSS-<slug>.md`
-(format in `runtime/README.md`: type, question, options, your recommendation, what is blocked) and stop —
-the run is then `escalated`, not failed. Never sign a merge, deploy, migration or rollback.
+and stop — the run is then `escalated`, not failed. The flag is machine-read; use exactly this shape:
+
+```markdown
+---
+id: flag-YYYYMMDDTHHMMSS-<slug>
+type: sign-off          # sign-off | red-line | triage | rollback | system
+step: 2
+feature: <slug>
+title: "one line — what must be decided"
+created: <ISO timestamp>
+status: open
+recommendation: <key of the option you would pick>
+---
+## Question
+One paragraph. The case: options, trade-offs, your recommendation, what is blocked.
+## Options
+- **<key>** — what choosing it means
+- **<key>** — …
+## Blocked until answered
+- what cannot proceed
+```
+
+Never sign a merge, deploy, migration or rollback.
 The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

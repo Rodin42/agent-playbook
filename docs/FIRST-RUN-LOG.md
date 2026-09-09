@@ -32,6 +32,9 @@ Raw material for the user manual (goal 2 of the run).
 | D-020 | chain | Local run records written into `runtime/runs/` were swept into an unrelated commit by `git add -A` and then conflicted with the sandbox's committed copy | orchestrator writes locally to `.factory/runs/`; core merges all sources | fixed 2026-09-10 |
 | D-021 | chain | The feature worktree lagged one commit: it was reset to `origin/<branch>` without fetching that ref first | orchestrator fetches `origin <branch>` before the reset | fixed 2026-09-10 |
 
+| D-022 | twin run | The twin wrote a flag in its own shape (type `decision-gate`, no title/created/recommendation keys, "Decisions needed" section): the referenced `runtime/README.md` format was not in its prompt | twin block now carries the exact flag skeleton inline | fixed 2026-09-10 |
+| D-023 | twin run | The console's flag parser treated a "Decisions needed" heading as a decision and showed the open flag as resolved | core `parseFlag` only accepts a heading exactly `## Decision` | fixed 2026-09-10 |
+
 ## Decisions taken by the operator during the run
 - 2026-09-08: no auth in v0; ontology version nullable at ingest; feedback panel (spec
   §12.6 / C.3) deferred; Postgres via compose locally and a service in CI; Step 3 runs

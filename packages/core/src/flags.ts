@@ -38,7 +38,8 @@ export function parseFlag(text: string, relPath: string): Flag | null {
     .map((l) => /^-\s+(.*)$/.exec(l)?.[1]?.trim() ?? "")
     .filter((s) => s.length > 0);
   const question = sectionLines(fm.body, /question/i).join("\n").trim();
-  const decLines = sectionLines(fm.body, /decision/i);
+  // Only a section headed exactly "Decision" resolves a flag — "Decisions needed" is part of the question.
+  const decLines = sectionLines(fm.body, /^##\s+decision\s*$/i);
   let decision: Flag["decision"] = null;
   if (decLines.some((l) => l.trim().length > 0)) {
     const kv = (k: string) => decLines.map((l) => new RegExp(`\\*\\*${k}:?\\*\\*:?\\s*(.*)$`, "i").exec(l)?.[1]?.trim()).find((v) => v) ?? null;
