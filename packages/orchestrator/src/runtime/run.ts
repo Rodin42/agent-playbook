@@ -194,9 +194,9 @@ export async function factoryRun(opts: RunOptions): Promise<RunOutcome> {
     const sha = commit.stdout.trim().split("\n").pop() ?? null;
     log(`pushed ${branch} @ ${sha?.slice(0, 7)}`);
     try {
-      execFileSync("git", ["fetch", "-q", "origin", `${branch}:${branch}`], { cwd: project, stdio: "ignore" });
+      execFileSync("git", ["fetch", "-q", "origin", branch], { cwd: project, stdio: "ignore" });
     } catch {
-      log("note: could not update the local branch ref (checked out?) — run git fetch");
+      log("note: git fetch failed — the worktree may lag origin");
     }
     record({ commit: sha });
     await updateWorktree(project, slug, branch, log);
