@@ -26,6 +26,9 @@ Raw material for the user manual (goal 2 of the run).
 | D-016 | Track B | The console reads the operator's working tree; sandbox commits land on `origin/feature/*` — invisible until a checkout | IMPROVEMENTS A7 | open |
 | D-017 | Stage 8 | A fine-grained PAT is bound to its resource owner: moving the repo into an organization killed it; a collaborator cannot issue one for a repo they do not own | user manual (token page) | documented |
 
+| D-018 | Track B | `factory template build` reads `runtime/sandbox.Dockerfile` from the operator's working tree, so a Dockerfile committed on a branch is not what gets built until that branch is checked out. Same for `runtime/steps.yaml`, which `factory run` reads locally | orchestrator: read both from the feature branch in the sandbox instead (IMPROVEMENTS B8) | open |
+| D-019 | A1 | The twin doc is self-authored, yet the run-step contract needed a mechanics block in it. The block was added to the template and mirrored; the operator must review it in their own voice | PR 2 note; user manual | documented |
+
 ## Decisions taken by the operator during the run
 - 2026-09-08: no auth in v0; ontology version nullable at ingest; feedback panel (spec
   §12.6 / C.3) deferred; Postgres via compose locally and a service in CI; Step 3 runs
