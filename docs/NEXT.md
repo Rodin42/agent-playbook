@@ -1,64 +1,46 @@
 # NEXT — the start file for the next session
 
-Read this first in a fresh session. It says what exists, what the next run builds, the
-rules, and what the operator must supply. Companion: `docs/EXECUTION-PLAN.md` (how the
-console was built, all steps ☑), `docs/SESSION-2026-09-06.md` (close-out).
+Read this first in a fresh session. Companions: `docs/FIRST-RUN-LOG.md` (every playbook
+defect met on the first real project), `docs/IMPROVEMENTS.md` (the prioritized fix list),
+`docs/EXECUTION-PLAN.md` (how the console was built).
 
-## State (2026-09-06, end of day)
+## State (2026-09-09, end of session)
 
-- Repo `Rodin42/agent-playbook` = the monorepo. `template/` (the playbook),
-  `packages/core` (derivation, 62 tests), `packages/orchestrator` (`factory ui`, `factory
-  new` real; `run/next/stop/template build` exit 2), `apps/console` (M1+M2 built:
-  read-only multi-project console on 127.0.0.1:4571). CI green.
-- Proven: `claude -p` authenticates inside a clean `node:22` container with only
-  `CLAUDE_CODE_OAUTH_TOKEN` (control without the token fails). `claude -p` exits 0 on
-  failure — success must be "artifact written and its status advanced", never exit code.
-- Run it: `npm ci && npm run build && npm run ui` (fixture workspace).
-- Nothing real flows yet: the console renders fixtures. No real project exists.
+- **The factory ran a real step.** `factory run product-strategist ingest-folder` on the
+  project `data-pipeline` (org `jbr-one`): sandbox from the project's own e2b image →
+  clone → seed the feature folder → 30k-char prompt → Claude Code headless (haiku) →
+  artifact verified by content → commit `e6df4fe` with `Factory-Role`/`Factory-Run`
+  trailers pushed to `feature/ingest-folder` → run record + log written → sandbox
+  destroyed. Cost $0.28, 4 min 25 s. The console reads the run record and the cost.
+  **That was the Track B acceptance.**
+- Monorepo: `packages/orchestrator/src/runtime/` = env, paths, prompt, verify, harness
+  (claude-code + pi stub), sandbox (e2b), run, template. 73 tests green. `factory run`,
+  `factory template build` real; `next`/`stop` still exit 2.
+- Project `~/factory-workspace/data-pipeline`: setup complete through Stage 9
+  (`docs/SETUP-HANDOVER.md`); everything sits on branch `factory-setup` = **PR 1, still
+  open** — the operator must merge it. `feature/ingest-folder` was branched from it.
+- Operator's GitHub: org `jbr-one` on Team plan, ruleset on `main`, secret scanning +
+  push protection on, PAT scoped to the repo. `.env` has all three tokens, verified.
 
-## The next run: one real feature moves
+## The next run
 
-**Track A · the real project (operator content + seeding)**
-1. `factory new <name> --workspace ~/factory-workspace --remote <git url>`; push it.
-2. Operator fills `project-brief.md`, `substrate.md` (esp. §6 Commands and §5 red lines),
-   `rodin-twin.md` mandate sections — plain words. Claude Code assists via
-   `start_prompt.md` Stages 2–5 but never invents priorities or red lines.
-3. Operator adds the first `feature-plan.md` entry (or a PO does). Console shows the
-   project with green pre-work ticks.
-
-**Track B · runtime Phase B (`template/runtime-plan.md` §4)**
-4. `factory template build`: e2b `factory-base` from a Dockerfile = `node:22` + git +
-   `@anthropic-ai/claude-code` + pi (installed, unconfigured). Record the template id
-   in the project's `factory.config.yaml`.
-5. `factory run <role> <feature>` v0, claude-code adapter: create sandbox → inject
-   `CLAUDE_CODE_OAUTH_TOKEN` + `GITHUB_TOKEN` as env only → clone the project repo at
-   the feature branch → compose prompt = role doc + the role's `reads:` files + the step
-   instruction → `claude -p --model <role model> "<prompt>" < /dev/null` → verify the
-   role's `writes:` artifact exists, parses, status advanced → commit `factory: <role>
-   <feature>` with `Factory-Role:` trailer → push → write `runtime/runs/<id>.json` +
-   log → destroy sandbox. Non-zero-signal failures → `status: failed` + reason.
-6. Run `product-strategist` on the first real entry. The commit lands, the console
-   re-derives, the run appears in step 1 runs & audit. **That is the acceptance.**
-7. Then `rodin-twin` checkpoint-1 on the same entry → the first real flag if gaps.
-
-**Then** M3 (approve = Ready, entry edits, config editor) so the loop closes in the
-console: PO entry → approve → `factory next` → artifacts → gates → flags → merge (M6).
+1. Operator merges PR 1. Then `feature/ingest-folder` is a normal feature branch off main.
+2. **IMPROVEMENTS A1** — write the run-step contract (role → artifact → status
+   before/after) into the template and role docs; make `verifyArtifact` use it.
+3. **A6 + A7 + B4** — branch policy for plan/runtime writes and the console read model
+   (worktree per feature or `git show origin/<branch>`); commit run records.
+4. **A3 + A4** — `factory.defaults.yaml` headless flags; literal verdict lines in the
+   gate role docs and template.
+5. Continue the chain on `ingest-folder`: ux-strategist, test-strategist, architect,
+   deployment-strategist, then `rodin-twin` masterplan → first flag if gaps.
+6. **B3** before the implementer runs: Postgres inside the sandbox image so `make test`
+   works there.
+7. Then M3 in the console, and the **user manual** (goal 2) from FIRST-RUN-LOG +
+   IMPROVEMENTS §E + SETUP-HANDOVER.
 
 ## Operating rules (unchanged)
 Autonomous, no check-ins; one commit per step, pushed immediately; `factory:` /
 `console:` prefixes; the repo is the truth; secrets never through the console or the
 chat; never merge, deploy, or push to `main` of the project repo without the operator.
-Sandboxes push `feature/*` branches only.
-
-## What the operator supplies before the run
-- Project **name** and **git remote** (which GitHub account: `Rodin42` or `jbr-rl`).
-- In the project: `.env` with `CLAUDE_CODE_OAUTH_TOKEN`, `E2B_API_KEY`, `GITHUB_TOKEN`
-  (fine-grained PAT, that repo only, contents r/w + pull requests write, no admin) —
-  pasted by the operator in an editor, never via chat or `echo`.
-- e2b account active (`e2b auth login` done by the operator in a terminal).
-- The content of Track A step 2 — or explicit permission to draft it for review.
-
-## Decisions pre-approved by the operator
-The name is agent-playbook for everything · claude-code is the harness on the Max plan ·
-haiku default, sonnet for implementer/senior-developer, opus for adversarial-reviewer ·
-localhost only · no database · M3–M6 after the runtime.
+Sandboxes push `feature/*` branches only. Every playbook defect is fixed at
+`template/` and mirrored into the project.
