@@ -71,7 +71,9 @@ export async function factoryRun(opts: RunOptions): Promise<RunOutcome> {
   const id = `${new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "")}-${opts.role}-${slug}`;
   const started = new Date().toISOString();
 
-  const runsDir = join(project, "runtime", "runs");
+  // Local record lives outside the tree the sandbox commits into (.factory is gitignored); the
+  // committed copy travels with the step's commit. The console merges both (core readRuns).
+  const runsDir = join(project, ".factory", "runs");
   const logsDir = join(project, "runtime", "logs");
   mkdirSync(runsDir, { recursive: true });
   mkdirSync(logsDir, { recursive: true });

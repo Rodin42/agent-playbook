@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseDecisions } from "./decisions.js";
-import { costSummary, parseRun } from "./runs.js";
+import { costSummary, parseRun, readRuns } from "./runs.js";
 
 describe("run registry (BUILD-PLAN §2.3)", () => {
   it("parses a run and computes duration", () => {
@@ -30,5 +30,23 @@ describe("decision log (BUILD-PLAN §2.4)", () => {
     expect(d).toHaveLength(2);
     expect(d[0]?.actor).toBe("operator");
     expect(d[1]?.step).toBe(2);
+  });
+});
+
+import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join as pjoin } from "node:path";
+
+describe("readRuns merges local, committed and worktree records", () => {
+  it("prefers the finished record over the running one with the same id", () => {
+    const root = mkdtempSync(pjoin(tmpdir(), "runs-"));
+    const rec = (status: string, ended: string | null) => JSON.stringify({ id: "r1", role: "x", step: 1, started: "2026-09-09T10:00:00Z", ended, status });
+    mkdirSync(pjoin(root, ".factory", "runs"), { recursive: true });
+    mkdirSync(pjoin(root, ".factory", "worktrees", "s", "runtime", "runs"), { recursive: true });
+    writeFileSync(pjoin(root, ".factory", "runs", "r1.json"), rec("running", null));
+    writeFileSync(pjoin(root, ".factory", "worktrees", "s", "runtime", "runs", "r1.json"), rec("ok", "2026-09-09T10:05:00Z"));
+    const runs = readRuns(root);
+    expect(runs).toHaveLength(1);
+    expect(runs[0]?.status).toBe("ok");
   });
 });

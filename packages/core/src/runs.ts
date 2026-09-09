@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { exists, listFiles, readText, str } from "./fs.js";
+import { exists, listDirs, listFiles, readText, str } from "./fs.js";
 import type { CostSummary, RunRecord, RunStatus, Step } from "./types.js";
 
 const STATUSES: RunStatus[] = ["running", "ok", "failed", "stopped", "escalated"];
@@ -46,14 +46,31 @@ export function parseRun(json: string, projectPath: string): RunRecord | null {
 
 const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 
+/**
+ * Run records come from three places: the checkout's `runtime/runs/` (committed history),
+ * `.factory/runs/` (the orchestrator's local record, including runs still running or failed),
+ * and every feature worktree's `runtime/runs/` (committed by sandboxes on feature branches).
+ * One record per id; a finished record beats a running one, later `ended` beats earlier.
+ */
 export function readRuns(projectPath: string): RunRecord[] {
-  const dir = join(projectPath, "runtime", "runs");
-  const runs: RunRecord[] = [];
-  for (const f of listFiles(dir, ".json")) {
-    const r = parseRun(readText(join(dir, f)) ?? "", projectPath);
-    if (r) runs.push(r);
+  const dirs = [join(projectPath, "runtime", "runs"), join(projectPath, ".factory", "runs")];
+  const wt = join(projectPath, ".factory", "worktrees");
+  for (const slug of listDirs(wt)) dirs.push(join(wt, slug, "runtime", "runs"));
+  const byId = new Map<string, RunRecord>();
+  for (const dir of dirs) {
+    for (const f of listFiles(dir, ".json")) {
+      const r = parseRun(readText(join(dir, f)) ?? "", projectPath);
+      if (!r) continue;
+      const cur = byId.get(r.id);
+      if (!cur || better(r, cur)) byId.set(r.id, r);
+    }
   }
-  return runs.sort((a, b) => (a.started < b.started ? 1 : -1));
+  return [...byId.values()].sort((a, b) => (a.started < b.started ? 1 : -1));
+}
+
+function better(a: RunRecord, b: RunRecord): boolean {
+  if ((a.status === "running") !== (b.status === "running")) return b.status === "running";
+  return (a.ended ?? "") > (b.ended ?? "");
 }
 
 export function readLogTail(projectPath: string, runId: string, lines = 120): string[] {
