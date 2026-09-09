@@ -90,7 +90,7 @@ async function main(): Promise<number> {
         log: (l) => console.log(l),
       });
       console.log(`\n${r.status.toUpperCase()} ${r.id}${r.reason ? ` — ${r.reason}` : ""}\nartifact: ${r.artifact}\nbranch: ${r.branch}${r.commit ? ` @ ${r.commit.slice(0, 7)}` : ""}\nrun: ${r.runFile}\nlog: ${r.logFile}`);
-      return r.status === "ok" ? 0 : 3;
+      return r.status === "ok" ? 0 : r.status === "escalated" ? 4 : 3;
     }
     case "template": {
       if (args.positional[0] !== "build") {

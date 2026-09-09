@@ -58,3 +58,8 @@ re-deciding anything. You plan; you do not write the feature code.
 This doc defines *what good planning means*. The repeatable procedure (locate → scope →
 sequence → write plan) can be wrapped as a Claude Code skill in
 `.claude/skills/senior-developer/` that cites this file.
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Write `features/<slug>/implementation-plan.md` with `status: final` — it is the build instruction.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

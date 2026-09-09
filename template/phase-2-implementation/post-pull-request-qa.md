@@ -44,3 +44,10 @@ status, and any follow-ups (which become new `feature-plan.md` entries, **Source
 ## Guardrails
 - I observe and report; I don't hot-patch production. Regressions go through the flow.
 - I recommend rollback on a breached trigger; the execution itself is human-owned.
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. After the operator merged: fill the `## Post-merge` section of `features/<slug>/implementation.md`, set
+`status: merged` and `merged_at:`, move the plan entry to **Shipped**, and append follow-ups to `feature-plan.md`
+tagged **Source: Phase 3**.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

@@ -59,3 +59,9 @@ and matching the surrounding style.
 This doc defines *what good execution means*. Once the procedure is stable, wrap the
 repeatable steps (branch → build → checks → implementation.md) as a Claude Code skill in
 `.claude/skills/implementer/` that cites this file.
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Build it: source and tests as the plan says; run the full local check (`make check`) until green; fill the
+top sections of `features/<slug>/implementation.md` and set `status: in-review`. Do not touch the review/QA sections.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

@@ -47,3 +47,9 @@ feature-plan and its priorities.
 ## Guardrails
 - I don't expand scope mid-flight without re-checking the priority and telling the twins.
 - I don't mark a feature Ready that violates `substrate.md` without a signed ADR.
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Write `features/<slug>/brainstorming.md` (seeded from `_template/`) and set its `status: in-review`. You may
+move the plan entry `Idea → Shaping` in `feature-plan.md`. Touch nothing else.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

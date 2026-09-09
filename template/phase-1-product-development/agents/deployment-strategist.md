@@ -3,7 +3,7 @@ id: deployment-strategist
 kind: ai-role
 phase: 1
 authority: advisory
-reads: [substrate.md, architecture.md, feature-plan.md]
+reads: [substrate.md, architecture.md, feature-plan.md, "features/<slug>/architecture-analysis.md", "features/<slug>/edge-case-analysis.md"]
 writes: ["features/<slug>/architecture-analysis.md"]
 handoff_to: [senior-developer, promoter, post-pull-request-qa]
 ---
@@ -49,3 +49,9 @@ back when it misbehaves.
 ## Guardrails
 - I plan rollouts; I never trigger a production deploy or data migration myself.
 - Any production-affecting step requires a human sign-off (see `promoter`).
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Second pass on `features/<slug>/architecture-analysis.md`: add the rollout, environments and observability view;
+keep `status: in-review`.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

@@ -4,10 +4,11 @@ import { join, resolve } from "node:path";
 import { loadEffectiveConfig, parseFrontmatter } from "@factory/core";
 import { envValue, readDotEnv, requireEnv } from "./env.js";
 import { harnessFor } from "./harness.js";
-import { FEATURE_TEMPLATE, featureFolder, locateRoleDoc, primaryWrite, repoSlug, resolveRef, toHttpsRepo, type ArtifactRef } from "./paths.js";
+import { FEATURE_TEMPLATE, PHASE1, featureFolder, locateRoleDoc, primaryWrite, repoSlug, resolveRef, toHttpsRepo, type ArtifactRef } from "./paths.js";
 import { composePrompt, defaultInstruction } from "./prompt.js";
 import { createE2bSandbox, type SandboxPort } from "./sandbox.js";
 import { verifyArtifact } from "./verify.js";
+import { loadSteps, verifyStep } from "./steps.js";
 
 export interface RunOptions {
   project: string;
@@ -23,7 +24,7 @@ export interface RunOptions {
 
 export interface RunOutcome {
   id: string;
-  status: "ok" | "failed";
+  status: "ok" | "failed" | "escalated";
   reason: string | null;
   artifact: string | null;
   branch: string;
@@ -60,8 +61,10 @@ export async function factoryRun(opts: RunOptions): Promise<RunOutcome> {
   const fm = parseFrontmatter(roleDocText);
   const reads = list(fm.data.reads);
   const writes = list(fm.data.writes).map((w) => resolveRef(w, slug)).filter((r): r is ArtifactRef => r !== null);
-  const primary = primaryWrite(list(fm.data.writes), slug);
+  const step = loadSteps(project, opts.role, slug);
+  const primary = step?.targets[0]?.ref ?? primaryWrite(list(fm.data.writes), slug);
   if (!primary) throw new Error(`role ${opts.role} has no file in writes: — nothing to verify`);
+  const judged = step ? step.targets.map((t) => t.ref.path) : [primary.path];
   const model = opts.model ?? cfg.models.roles.find((r) => r.role === opts.role)?.model ?? cfg.models.default.model;
   const branch = `feature/${slug}`;
   const base = opts.base ?? cfg.project.main_branch;
@@ -127,7 +130,10 @@ export async function factoryRun(opts: RunOptions): Promise<RunOutcome> {
         else log(`warning: input missing: ${ref.path}`);
       }
     }
-    const before = await sandbox.readFile(`${REPO_DIR}/${primary.path}`);
+    const before = new Map<string, string | null>();
+    for (const p of judged) before.set(p, await sandbox.readFile(`${REPO_DIR}/${p}`));
+    const flagsBefore = (await sandbox.exec(`ls ${REPO_DIR}/runtime/flags 2>/dev/null`)).stdout;
+    log(step ? `contract: ${judged.length} target(s) from runtime/steps.yaml` : "contract: none in runtime/steps.yaml — falling back to primary write");
     const prompt = composePrompt({ role: opts.role, roleDoc: roleDocText, slug, reads: readTexts, writes, instruction: defaultInstruction(opts.role, slug, writes) });
     await sandbox.writeFile(PROMPT_PATH, prompt);
     log(`prompt: ${prompt.length} chars, ${readTexts.length} inputs`);
@@ -144,11 +150,40 @@ export async function factoryRun(opts: RunOptions): Promise<RunOutcome> {
     record({ cost_usd: parsed.costUsd, tokens: { in: parsed.tokensIn, out: parsed.tokensOut } });
     outcome = { ...outcome, costUsd: parsed.costUsd };
 
-    // Verify by artifact.
-    const after = await sandbox.readFile(`${REPO_DIR}/${primary.path}`);
-    const verdict = verifyArtifact(primary, before, after);
-    if (!verdict.ok) return (outcome = fail(`artifact check: ${verdict.reason}${parsed.isError ? " (harness reported an error)" : ""}`));
-    log(`artifact ok: ${primary.path} status=${verdict.status}`);
+    // Verify by artifact against the contract — never by exit code.
+    const after = new Map<string, string | null>();
+    for (const p of judged) after.set(p, await sandbox.readFile(`${REPO_DIR}/${p}`));
+    const verdict = step
+      ? verifyStep(step, before, after)
+      : { ...verifyArtifact(primary, before.get(primary.path) ?? null, after.get(primary.path) ?? null), gate: null as "pass" | "fail" | null, route: null as string | null };
+    const flagsAfter = (await sandbox.exec(`ls ${REPO_DIR}/runtime/flags 2>/dev/null`)).stdout;
+    const newFlag = flagsAfter.split("\n").find((f) => f.trim() && !flagsBefore.includes(f)) ?? null;
+    let escalated = false;
+    if (!verdict.ok) {
+      if (step?.escalate && newFlag) {
+        escalated = true;
+        log(`escalated: ${opts.role} wrote runtime/flags/${newFlag.trim()} (${verdict.reason})`);
+      } else return (outcome = fail(`artifact check: ${verdict.reason}${parsed.isError ? " (harness reported an error)" : ""}`));
+    } else log(`contract ok: ${judged.join(", ")} status=${verdict.status}${verdict.gate ? ` verdict=${verdict.gate}${verdict.route ? ` → ${verdict.route}` : ""}` : ""}`);
+
+    // First phase-2 run flips the plan entry Ready → In progress (features/README).
+    if (stepOf(roleDocRel) === 2 && !escalated) {
+      const planPath = `${REPO_DIR}/${PHASE1}/feature-plan.md`;
+      const plan = await sandbox.readFile(planPath);
+      if (plan) {
+        const re = new RegExp(`^(\\|[^\\n]*\\|\\s*)Ready(\\s*\\|[^\\n]*\`features/${slug}/\`[^\\n]*)$`, "m");
+        if (re.test(plan)) {
+          await sandbox.writeFile(planPath, plan.replace(re, "$1In progress$2"));
+          log("plan entry: Ready → In progress");
+        }
+      }
+    }
+
+    // The run record travels with the commit (runtime/runs is part of the trail).
+    const finalStatus = escalated ? "escalated" : "ok";
+    record({ status: finalStatus, ended: new Date().toISOString(), reason: escalated ? `flag runtime/flags/${newFlag?.trim()}` : null });
+    await sandbox.exec(`mkdir -p ${REPO_DIR}/runtime/runs`);
+    await sandbox.writeFile(`${REPO_DIR}/runtime/runs/${id}.json`, readFileSync(runFile, "utf8"));
 
     // Commit + push: the durable trail.
     const msg = `factory: ${opts.role} ${slug}\n\nFactory-Role: ${opts.role}\nFactory-Run: ${id}`;
@@ -161,8 +196,9 @@ export async function factoryRun(opts: RunOptions): Promise<RunOutcome> {
     } catch {
       log("note: could not update the local branch ref (checked out?) — run git fetch");
     }
-    record({ status: "ok", ended: new Date().toISOString(), commit: sha });
-    outcome = { ...outcome, status: "ok", reason: null, commit: sha };
+    record({ commit: sha });
+    await updateWorktree(project, slug, branch, log);
+    outcome = { ...outcome, status: finalStatus, reason: escalated ? `flag runtime/flags/${newFlag?.trim()}` : null, commit: sha };
     return outcome;
   } catch (err) {
     return (outcome = fail(err instanceof Error ? err.message : String(err)));
@@ -171,5 +207,26 @@ export async function factoryRun(opts: RunOptions): Promise<RunOutcome> {
       await sandbox.destroy().catch(() => undefined);
       log(`sandbox ${sandbox.id} destroyed`);
     } else if (sandbox) log(`sandbox ${sandbox.id} kept alive (--keep)`);
+  }
+}
+
+/**
+ * The console reads the operator's working tree; sandbox commits live on origin/feature/<slug>.
+ * Keep a worktree per feature under .factory/worktrees/<slug> so the console can overlay it (A7).
+ */
+async function updateWorktree(project: string, slug: string, branch: string, log: (l: string) => void): Promise<void> {
+  const dir = join(project, ".factory", "worktrees", slug);
+  const git = (...args: string[]) => execFileSync("git", args, { cwd: project, stdio: ["ignore", "pipe", "pipe"] }).toString().trim();
+  try {
+    if (!existsSync(dir)) {
+      mkdirSync(join(project, ".factory", "worktrees"), { recursive: true });
+      git("worktree", "add", "-q", "--force", dir, branch);
+    } else {
+      execFileSync("git", ["-C", dir, "checkout", "-q", branch], { stdio: "ignore" });
+      execFileSync("git", ["-C", dir, "reset", "-q", "--hard", `origin/${branch}`], { stdio: "ignore" });
+    }
+    log(`worktree .factory/worktrees/${slug} at ${branch}`);
+  } catch (err) {
+    log(`note: worktree update failed: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
   }
 }

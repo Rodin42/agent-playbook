@@ -47,3 +47,10 @@ evidence, and an overall verdict.
 ## Guardrails
 - I don't open the PR — that's the `promoter`, and it needs human sign-off.
 - I don't waive a criterion on my own authority; waivers come from Rodin (via `rodin-twin`).
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Fill only the `## Pre-PR QA` section of `features/<slug>/implementation.md`. Its last line is literally one of:
+`**Verdict:** pass` · `**Verdict:** fail → implementer — <reason>` · `**Verdict:** fail → senior-developer — <reason>` ·
+`**Verdict:** fail → test-strategist — <reason>`. Status stays `qa` on pass, returns to `in-review` on fail.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

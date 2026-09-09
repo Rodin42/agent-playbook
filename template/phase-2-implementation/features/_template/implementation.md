@@ -7,6 +7,8 @@ plan_ref: "F-NNN"
 authors: [implementer]
 status: in-progress   # in-progress | in-review | qa | merged
 branch: "feature/<feature-slug>"
+pr:            # set by promoter: the PR number, e.g. 42
+merged_at:     # set by post-pull-request-qa: ISO timestamp
 ---
 
 # Implementation — `<feature name>`
@@ -36,29 +38,29 @@ The steps a reviewer runs to see it work, and what was tested at each level.
 ---
 
 ## Adversarial review
-_Filled by `adversarial-reviewer`. Findings most-severe first._
+_Filled by `adversarial-reviewer`. Heading is machine-read — do not rename._ Findings most-severe first._
 
 | Severity | Finding | Failing scenario | Status |
 | --- | --- | --- | --- |
 | | | | open / fixed / accepted |
 
-**Verdict:** pass → pre-PR QA · fail → route by what broke: code wrong → implementer · plan wrong → senior-developer.
+_Last line of this section, literally one of (machine-read):_ `**Verdict:** pass` · `**Verdict:** fail → implementer — <reason>` · `**Verdict:** fail → senior-developer — <reason>`
 
 ---
 
 ## Pre-PR QA
-_Filled by `pre-pull-request-qa`. Each item pass/fail with evidence._
+_Filled by `pre-pull-request-qa`. Heading is machine-read — do not rename._ Each item pass/fail with evidence._
 
 - [ ] Builds clean · [ ] Suite green · [ ] Acceptance criteria demonstrated
 - [ ] Review findings resolved · [ ] Substrate red lines respected · [ ] No secrets
 - [ ] Observability present · [ ] Docs updated · [ ] Diff scoped
 
-**Verdict:** pass → promoter · fail → route by what broke: code → implementer · plan → senior-developer · untestable criterion → test-strategist.
+_Last line of this section, literally one of (machine-read):_ `**Verdict:** pass` · `**Verdict:** fail → implementer — <reason>` · `**Verdict:** fail → senior-developer — <reason>` · `**Verdict:** fail → test-strategist — <reason>`
 
 ---
 
 ## Post-merge
-_Filled by `post-pull-request-qa`._
+_Filled by `post-pull-request-qa`. Heading is machine-read — do not rename._
 
 - **Deploy/rollout result:** `<...>`
 - **Health over the watch window:** `<error rate, latency, key metric>`

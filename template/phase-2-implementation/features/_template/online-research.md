@@ -4,7 +4,7 @@ kind: artifact
 phase: 2
 feature: "<feature-slug>"
 plan_ref: "F-NNN"
-authors: ["<role>"]
+authors: [ux-strategist]
 status: draft   # draft | in-review | final | superseded  (final = accepted, consumers may read)
 ---
 

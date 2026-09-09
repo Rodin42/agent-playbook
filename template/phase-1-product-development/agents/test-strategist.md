@@ -3,7 +3,7 @@ id: test-strategist
 kind: ai-role
 phase: 1
 authority: advisory
-reads: [substrate.md, architecture.md, feature-plan.md]
+reads: [substrate.md, architecture.md, feature-plan.md, "features/<slug>/brainstorming.md", "features/<slug>/online-research.md"]
 writes: ["features/<slug>/edge-case-analysis.md"]
 handoff_to: [senior-developer, adversarial-reviewer, pre-pull-request-qa]
 ---
@@ -47,3 +47,8 @@ likely to break.
 
 ## Guardrails
 - I don't sign off on "we'll add tests later." The plan exists before implementation.
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Write `features/<slug>/edge-case-analysis.md` with `status: in-review`.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

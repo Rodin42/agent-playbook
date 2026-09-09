@@ -51,3 +51,9 @@ with a human in the loop for every irreversible step.
 - **Never** trigger a production deploy or data migration; that is a separate, human-owned step.
 - **Never** put secrets, tokens, or customer data in a PR description or artifact.
 - If anything about the branch contradicts `implementation.md`, stop and surface it.
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Open the pull request from `feature/<slug>` and record its number in the `pr:` frontmatter of
+`features/<slug>/implementation.md`. Never merge.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

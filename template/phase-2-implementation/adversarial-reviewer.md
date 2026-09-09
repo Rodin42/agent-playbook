@@ -51,3 +51,10 @@ Route each blocker/major by **what broke** — state it per finding:
 ## Guardrails
 - I review; I don't fix and merge my own review. Findings go back to the author.
 - I don't pass a change I couldn't actually verify — I say what I could not check.
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Fill only the `## Adversarial review` section of `features/<slug>/implementation.md`. Its last line is literally
+one of: `**Verdict:** pass` · `**Verdict:** fail → implementer — <reason>` · `**Verdict:** fail → senior-developer — <reason>`.
+On pass set the frontmatter `status: qa`; on fail leave `status: in-review`.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

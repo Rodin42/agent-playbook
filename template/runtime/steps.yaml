@@ -1,0 +1,68 @@
+# steps.yaml — the run-step contract. One entry per role: what one `factory run <role> <feature>`
+# must leave behind for the orchestrator to mark the run `ok`. Paths use the same shorthand as
+# the role docs' reads/writes (bare name → phase-1, features/<slug>/… → phase-2).
+#
+#   status        the target's frontmatter `status:` after the run (exact match)
+#   second_pass   the file already exists at that status; the run must still change it
+#   section       the run writes only this `## <section>` of the file
+#   verdict       the section must end with a literal verdict line:
+#                   **Verdict:** pass            → status becomes status_on_pass
+#                   **Verdict:** fail → <role> — <reason>   → status becomes status_on_fail
+#   frontmatter   the run must set this frontmatter key to a real value
+#   may_edit      other files the role may change; not judged
+#   escalate      the role may stop by writing runtime/flags/<id>.md instead → run status `escalated`
+#
+# Vocabularies: documents = draft | in-review | final | superseded
+#               implementation.md = in-progress | in-review | qa | merged
+# Who finalises discovery docs: rodin-twin, when it writes the masterplan (that is the sign-off).
+# Who moves the plan: the operator marks an entry Ready; the orchestrator flips it to In progress
+# on the first phase-2 run; the promoter records the PR; post-pull-request-qa sets merged.
+
+roles:
+  product-strategist:
+    targets:
+      - { path: "features/<slug>/brainstorming.md", status: in-review }
+    may_edit: [feature-plan.md]
+  ux-strategist:
+    targets:
+      - { path: "features/<slug>/brainstorming.md", status: in-review, second_pass: true }
+      - { path: "features/<slug>/online-research.md", status: in-review }
+  test-strategist:
+    targets:
+      - { path: "features/<slug>/edge-case-analysis.md", status: in-review }
+  architect:
+    targets:
+      - { path: "features/<slug>/architecture-analysis.md", status: in-review }
+    may_edit: [architecture.md]
+  deployment-strategist:
+    targets:
+      - { path: "features/<slug>/architecture-analysis.md", status: in-review, second_pass: true }
+  rodin-twin:
+    targets:
+      - { path: "features/<slug>/masterplan.md", status: final }
+      - { path: "features/<slug>/brainstorming.md", status: final }
+      - { path: "features/<slug>/online-research.md", status: final }
+      - { path: "features/<slug>/edge-case-analysis.md", status: final }
+      - { path: "features/<slug>/architecture-analysis.md", status: final }
+    may_edit: [feature-plan.md, "runtime/flags/*"]
+    escalate: true
+  senior-developer:
+    targets:
+      - { path: "features/<slug>/implementation-plan.md", status: final }
+  implementer:
+    targets:
+      - { path: "features/<slug>/implementation.md", status: in-review }
+    may_edit: ["<source code>", "<tests>"]
+  adversarial-reviewer:
+    targets:
+      - { path: "features/<slug>/implementation.md", section: "Adversarial review", verdict: true, status_on_pass: qa, status_on_fail: in-review }
+  pre-pull-request-qa:
+    targets:
+      - { path: "features/<slug>/implementation.md", section: "Pre-PR QA", verdict: true, status_on_pass: qa, status_on_fail: in-review }
+  promoter:
+    targets:
+      - { path: "features/<slug>/implementation.md", frontmatter: pr }
+  post-pull-request-qa:
+    targets:
+      - { path: "features/<slug>/implementation.md", section: "Post-merge", status: merged }
+    may_edit: [feature-plan.md]

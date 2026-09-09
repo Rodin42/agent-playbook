@@ -15,7 +15,9 @@ harness:
   provider: claude-code          # swap point 2 — alt: pi
   claude-code:
     command: claude
-    headless_flags: ["-p"]
+    headless_flags: ["-p", "--output-format", "json", "--dangerously-skip-permissions"]
+    # -p reads the prompt from stdin; json gives cost + tokens; the permission flag is what lets a
+    # headless run write files at all (nobody can answer a permission prompt in a sandbox).
     auth_env: CLAUDE_CODE_OAUTH_TOKEN   # generated once via `claude setup-token`,
                                         # stored in .env, injected into sandboxes only
   pi:

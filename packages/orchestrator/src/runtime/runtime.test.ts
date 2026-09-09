@@ -67,3 +67,52 @@ describe("prompt", () => {
     expect(p).toContain("- `x.md`");
   });
 });
+
+import { parseSteps, verifyStep } from "./steps.js";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const STEPS = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../../../../template/runtime/steps.yaml"), "utf8");
+const doc = (status: string, extra = "") => `---\nid: x\nfeature: s\nplan_ref: F-001\nstatus: ${status}\n${extra}---\n\n# X\nbody\n`;
+
+describe("steps contract", () => {
+  it("resolves the product-strategist target to the feature folder", () => {
+    const st = parseSteps(STEPS, "product-strategist", "s");
+    expect(st?.targets[0]?.ref.path).toBe("phase-2-implementation/features/s/brainstorming.md");
+    expect(st?.targets[0]?.status).toBe("in-review");
+  });
+  it("passes when the target reaches the expected status and changed", () => {
+    const st = parseSteps(STEPS, "product-strategist", "s")!;
+    const p = st.targets[0]!.ref.path;
+    const v = verifyStep(st, new Map([[p, doc("draft")]]), new Map([[p, doc("in-review")]]));
+    expect(v.ok).toBe(true);
+  });
+  it("fails on wrong status, unchanged second pass, missing file", () => {
+    const ps = parseSteps(STEPS, "product-strategist", "s")!;
+    const p = ps.targets[0]!.ref.path;
+    expect(verifyStep(ps, new Map([[p, doc("draft")]]), new Map([[p, doc("draft")]])).reason).toMatch(/expected "in-review"/);
+    const ux = parseSteps(STEPS, "ux-strategist", "s")!;
+    const [b, o] = ux.targets.map((t) => t.ref.path) as [string, string];
+    const same = doc("in-review");
+    expect(verifyStep(ux, new Map([[b, same], [o, null]]), new Map([[b, same], [o, doc("in-review")]])).reason).toMatch(/second pass/);
+    expect(verifyStep(ux, new Map([[b, same]]), new Map([[b, same + "more\n"]])).reason).toMatch(/not written/);
+  });
+  it("gates need a literal verdict line and the matching status", () => {
+    const st = parseSteps(STEPS, "adversarial-reviewer", "s")!;
+    const p = st.targets[0]!.ref.path;
+    const impl = (status: string, verdict: string) => `---\nid: implementation\nfeature: s\nplan_ref: F-001\nstatus: ${status}\n---\n\n## What was built\nx\n\n## Adversarial review\nfindings\n\n**Verdict:** ${verdict}\n\n## Pre-PR QA\n`;
+    expect(verifyStep(st, new Map([[p, impl("in-review", "pass → pre-PR QA")]]), new Map([[p, impl("qa", "pass → pre-PR QA")]])).reason).toMatch(/no literal verdict/);
+    expect(verifyStep(st, new Map([[p, impl("in-review", "x")]]), new Map([[p, impl("in-review", "pass")]])).reason).toMatch(/expected "qa"/);
+    const ok = verifyStep(st, new Map([[p, impl("in-review", "x")]]), new Map([[p, impl("qa", "pass")]]));
+    expect(ok).toMatchObject({ ok: true, gate: "pass" });
+    const routed = verifyStep(st, new Map([[p, impl("in-review", "x")]]), new Map([[p, impl("in-review", "fail → implementer — tests missing")]]));
+    expect(routed).toMatchObject({ ok: true, gate: "fail", route: "implementer" });
+  });
+  it("promoter must set pr:", () => {
+    const st = parseSteps(STEPS, "promoter", "s")!;
+    const p = st.targets[0]!.ref.path;
+    expect(verifyStep(st, new Map([[p, doc("qa")]]), new Map([[p, doc("qa", "pr: \n")]])).reason).toMatch(/pr:/);
+    expect(verifyStep(st, new Map([[p, doc("qa")]]), new Map([[p, doc("qa", "pr: 42\n")]])).ok).toBe(true);
+  });
+});

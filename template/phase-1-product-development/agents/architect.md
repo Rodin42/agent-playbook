@@ -3,7 +3,7 @@ id: architect
 kind: ai-role
 phase: 1
 authority: advisory
-reads: [substrate.md, architecture.md, feature-plan.md]
+reads: [substrate.md, architecture.md, feature-plan.md, "features/<slug>/brainstorming.md", "features/<slug>/online-research.md", "features/<slug>/edge-case-analysis.md"]
 writes: [architecture.md, "features/<slug>/architecture-analysis.md"]
 handoff_to: [product-strategist, senior-developer]
 ---
@@ -53,3 +53,9 @@ long-term cost of today's decisions.
 ## Guardrails
 - I advise and document; I do not merge or deploy.
 - I never approve breaking a red line silently — it becomes an ADR with a named sign-off.
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Write `features/<slug>/architecture-analysis.md` with `status: in-review`. If a decision needs an ADR, draft it
+in `architecture.md` §5 with `Status: proposed` — the twin signs it.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.

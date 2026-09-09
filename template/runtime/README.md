@@ -24,12 +24,34 @@ it never owns them.
    is an external input, not a file.
 5. Run the harness headless: `claude -p --model <model> --output-format json
    --dangerously-skip-permissions < prompt.md` (cwd = repo). Exit code is informational.
-6. **Verdict by artifact**, never by exit code: the primary `writes:` target (the first
-   entry under `features/<slug>/`, else the first file entry) must exist, parse, carry a
-   `status:` from `draft | in-review | final | superseded`, have no placeholders left in
-   its frontmatter, and differ from before. `#section` targets must contain `## <section>`.
-7. Commit `factory: <role> <slug>` with trailers `Factory-Role:` and `Factory-Run:`; push
-   the feature branch; update the local branch ref; destroy the sandbox.
+6. **Verdict by contract**, never by exit code: `steps.yaml` names the role's targets and
+   the status each must carry afterwards (or the literal verdict line for gate sections).
+   Every target must exist, parse, have no placeholders in its frontmatter, and at least
+   one must have changed. A role with `escalate: true` may instead leave a new
+   `flags/<id>.md`: the run is then `escalated`, not failed.
+7. Write `runs/<id>.json` into the checkout, commit `factory: <role> <slug>` with trailers
+   `Factory-Role:` and `Factory-Run:`, push the feature branch, refresh the feature
+   worktree, destroy the sandbox.
+
+## Branch policy — where each write goes
+
+| Write | Branch | Reaches `main` via |
+| --- | --- | --- |
+| feature artifacts, code, tests | `feature/<slug>` | the feature's pull request |
+| `feature-plan.md` edits made during a feature run | `feature/<slug>` | the same PR (plan status travels with the feature) |
+| `runs/<id>.json`, `flags/<id>.md` written during a feature run | `feature/<slug>` | the same PR |
+| Phase-3 housekeeping (no feature) | `factory/housekeeping-<date>` | its own PR |
+| console actions (approve, resolve flag) | the operator's checkout, pushed as a PR by the console (M3) | PR |
+
+Sandboxes never push `main`. Only the operator merges.
+
+## Where the console reads
+
+The console derives from the operator's checkout. Because sandbox commits land on
+`origin/feature/<slug>`, the orchestrator keeps a git worktree per feature at
+`.factory/worktrees/<slug>/` (gitignored), reset to the branch tip after every run, and the
+console reads a feature folder from there when it exists. Run records and logs are written
+to the checkout's `runtime/` directly.
 
 ## `runs/<id>.json`
 

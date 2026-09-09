@@ -3,10 +3,18 @@ import { exists, readFrontmatter, str } from "./fs.js";
 import { ARTIFACT_KINDS, type Artifact, type ArtifactKind, type GateVerdict, type PrInfo } from "./types.js";
 
 /** `features/<slug>` in the plan lives under phase-2-implementation/ in the repo. */
+/**
+ * Feature folders are read from the operator's tree, or — when the orchestrator keeps a
+ * worktree for the feature branch under `.factory/worktrees/<slug>/` — from that worktree,
+ * which is always at the tip of `origin/feature/<slug>` (runtime/README.md, "Where the
+ * console reads"). The worktree wins because sandbox commits land there first.
+ */
 export function resolveFeatureFolder(projectPath: string, folder: string): string {
   const rel = folder.replace(/^\.?\//, "").replace(/\/$/, "");
-  const candidates = [join(projectPath, "phase-2-implementation", rel), join(projectPath, rel)];
-  return candidates.find((c) => exists(c)) ?? (candidates[0] as string);
+  const slug = rel.split("/").pop() ?? rel;
+  const worktree = join(projectPath, ".factory", "worktrees", slug, "phase-2-implementation", "features", slug);
+  const candidates = [worktree, join(projectPath, "phase-2-implementation", rel), join(projectPath, rel)];
+  return candidates.find((c) => exists(c)) ?? (candidates[1] as string);
 }
 
 export function readArtifacts(projectPath: string, folderAbs: string): Artifact[] {

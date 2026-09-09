@@ -3,8 +3,8 @@ id: ux-strategist
 kind: ai-role
 phase: 1
 authority: advisory
-reads: [feature-plan.md, substrate.md]
-writes: ["features/<slug>/brainstorming.md", "features/<slug>/edge-case-analysis.md"]
+reads: [feature-plan.md, substrate.md, "features/<slug>/brainstorming.md"]
+writes: ["features/<slug>/brainstorming.md", "features/<slug>/online-research.md"]
 handoff_to: [product-strategist, senior-developer]
 ---
 
@@ -49,3 +49,9 @@ hard to get wrong.
 
 ## Guardrails
 - I flag when "delight" is being added at the cost of clarity or accessibility.
+
+## When run by the orchestrator
+The prompt you receive is this doc plus your `reads:` files plus a step instruction; the repo is checked out on
+`feature/<slug>` in the current directory. Second pass on `features/<slug>/brainstorming.md` (add the desirability view; keep `status: in-review`) and
+write `features/<slug>/online-research.md` (prior art, competitors, libraries, pitfalls) with `status: in-review`.
+The run counts as done only when `runtime/steps.yaml` holds for this role — never from your exit code.
