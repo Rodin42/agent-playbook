@@ -3,6 +3,8 @@ import { homedir } from "node:os";
 import { resolve } from "node:path";
 import { startConsole } from "@factory/console";
 import { factoryNew } from "./new.js";
+import { factoryRun } from "./runtime/run.js";
+import { factoryTemplateBuild } from "./runtime/template.js";
 
 const DEFAULT_WORKSPACE = resolve(homedir(), "factory-workspace");
 
@@ -38,10 +40,12 @@ const HELP = `factory — the agent factory CLI
                serve the operator console for a workspace (default ~/factory-workspace)
   factory new  <name> [--workspace <path>] [--remote <git url>]
                seed a project from template/, git init + first commit, register it
-  factory run  <role> <feature>        (Phase B/C)
-  factory next                         (Phase B/C)
-  factory stop <runid>                 (Phase B/C)
-  factory template build               (Phase B)
+  factory run  <role> <feature> [--project <path>] [--model <m>] [--base <branch>] [--keep]
+               one pipeline step: sandbox → clone feature branch → role prompt → verify artifact → commit+push
+  factory template build [--project <path>] [--alias <name>] [--dockerfile <path>]
+               build the project's e2b sandbox image from runtime/sandbox.Dockerfile
+  factory next                         (Phase C)
+  factory stop <runid>                 (Phase C)
 `;
 
 async function main(): Promise<number> {
@@ -71,11 +75,40 @@ async function main(): Promise<number> {
       console.log(`seeded ${r.path}\nregistered in ${r.workspaceFile}\nnext: ${r.next}`);
       return 0;
     }
-    case "run":
+    case "run": {
+      const [role, feature] = args.positional;
+      if (!role || !feature) {
+        console.error("usage: factory run <role> <feature> [--project <path>] [--model <m>] [--base <branch>] [--keep]");
+        return 1;
+      }
+      const project = typeof args.flags.project === "string" ? args.flags.project : process.cwd();
+      const r = await factoryRun({
+        project, role, feature,
+        model: typeof args.flags.model === "string" ? args.flags.model : undefined,
+        base: typeof args.flags.base === "string" ? args.flags.base : undefined,
+        keep: args.flags.keep === true,
+        log: (l) => console.log(l),
+      });
+      console.log(`\n${r.status.toUpperCase()} ${r.id}${r.reason ? ` — ${r.reason}` : ""}\nartifact: ${r.artifact}\nbranch: ${r.branch}${r.commit ? ` @ ${r.commit.slice(0, 7)}` : ""}\nrun: ${r.runFile}\nlog: ${r.logFile}`);
+      return r.status === "ok" ? 0 : 3;
+    }
+    case "template": {
+      if (args.positional[0] !== "build") {
+        console.error("usage: factory template build [--project <path>] [--alias <name>] [--dockerfile <path>]");
+        return 1;
+      }
+      const project = typeof args.flags.project === "string" ? args.flags.project : process.cwd();
+      const r = await factoryTemplateBuild({
+        project,
+        alias: typeof args.flags.alias === "string" ? args.flags.alias : undefined,
+        dockerfile: typeof args.flags.dockerfile === "string" ? args.flags.dockerfile : undefined,
+      });
+      console.log(`built template ${r.alias} (id ${r.templateId}, build ${r.buildId})\nrecord it in factory.config.yaml → sandbox.e2b.template: "${r.alias}"`);
+      return 0;
+    }
     case "next":
     case "stop":
-    case "template":
-      console.error(`factory ${args.cmd}: not implemented until Phase B/C (runtime-plan.md §4)`);
+      console.error(`factory ${args.cmd}: not implemented until Phase C (runtime-plan.md §4)`);
       return 2;
     case null:
     case "help":
