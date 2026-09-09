@@ -94,15 +94,15 @@ type: sign-off          # sign-off | red-line | triage | rollback | system
 step: 2
 feature: <slug>
 title: "one line — what must be decided"
-created: <ISO timestamp>
+created: ISO-TIMESTAMP
 status: open
-recommendation: <key of the option you would pick>
+recommendation: KEY-OF-THE-OPTION-YOU-WOULD-PICK
 ---
 ## Question
 One paragraph. The case: options, trade-offs, your recommendation, what is blocked.
 ## Options
-- **<key>** — what choosing it means
-- **<key>** — …
+- **KEY** — what choosing it means
+- **OTHER-KEY** — …
 ## Blocked until answered
 - what cannot proceed
 ```
