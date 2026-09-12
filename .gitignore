@@ -8,3 +8,7 @@ dist/
 *.tsbuildinfo
 apps/console/client/dist/
 !apps/console/fixtures/**/*.log
+
+# wiersholm: avledede filer
+wiersholm/dist/
+wiersholm/agents/

@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wiersholm Agentkatalog</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F1F4F3; --surface:#FFFFFF; --surface-2:#E9EEEC;
+  --ink:#14201F; --ink-2:#51625E; --ink-3:#7C8C88;
+  --line:#D8E0DE; --line-2:#C3CFCC;
+  --juridisk:#0F5257; --forretningsstotte:#8A5320;
+  --accent:#0F5257; --accent-soft:#E2EDEC;
+  --ok:#256D4F; --warn:#8A6510; --crit:#9E2F26;
+  --ok-soft:#E4EFE9; --warn-soft:#F5EDDC; --crit-soft:#F6E6E3;
+  --accent-ink:#FFFFFF;
+  --skygge:0 1px 2px rgba(20,32,31,.05);
+  --skygge-hev:0 18px 46px rgba(20,32,31,.18);
+  --serif:"Spectral",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1312; --surface:#141B1A; --surface-2:#1C2524;
+    --ink:#E3E9E7; --ink-2:#9BA9A5; --ink-3:#78867F;
+    --line:#243030; --line-2:#31403E;
+    --juridisk:#63B8AD; --forretningsstotte:#CE9757;
+    --accent:#63B8AD; --accent-soft:#172A28;
+    --ok:#5FB183; --warn:#C79B46; --crit:#D9776B;
+    --ok-soft:#13251D; --warn-soft:#25200F; --crit-soft:#2A1917;
+    --accent-ink:#0D1312;
+    --skygge:0 1px 2px rgba(0,0,0,.4);
+    --skygge-hev:0 18px 46px rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1312; --surface:#141B1A; --surface-2:#1C2524;
+  --ink:#E3E9E7; --ink-2:#9BA9A5; --ink-3:#78867F;
+  --line:#243030; --line-2:#31403E;
+  --juridisk:#63B8AD; --forretningsstotte:#CE9757;
+  --accent:#63B8AD; --accent-soft:#172A28;
+  --ok:#5FB183; --warn:#C79B46; --crit:#D9776B;
+  --ok-soft:#13251D; --warn-soft:#25200F; --crit-soft:#2A1917;
+  --accent-ink:#0D1312;
+  --skygge:0 1px 2px rgba(0,0,0,.4);
+  --skygge-hev:0 18px 46px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;margin:0;text-wrap:balance}
+.mono{font-family:var(--mono)}
+
+/* ── topplinje ─────────────────────────────────────────────── */
+header.topp{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line)}
+.topp-rad{display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  max-width:1240px;margin:0 auto;padding:14px 20px}
+.merke{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.merke h1{font-size:20px;letter-spacing:-.01em}
+.merke .undertekst{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+.sok{position:relative;flex:0 1 300px;min-width:180px}
+.sok input{width:100%;padding:8px 12px 8px 32px;background:var(--ground);border:1px solid var(--line-2);
+  border-radius:2px;font-size:14px}
+.sok input::placeholder{color:var(--ink-3)}
+.sok svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-3)}
+.knapp{padding:8px 14px;background:var(--surface);border:1px solid var(--line-2);border-radius:2px;
+  font-size:14px;font-weight:500;white-space:nowrap}
+.knapp:hover{border-color:var(--ink-3)}
+.knapp.primar{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.knapp.primar:hover{filter:brightness(1.1)}
+.knapp.fare{color:var(--crit);border-color:var(--line-2)}
+.knapp.fare:hover{background:var(--crit-soft);border-color:var(--crit)}
+.knapp[disabled]{opacity:.45;cursor:default}
+.lagringsmerke{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--ink-2);
+  padding:5px 9px;border:1px solid var(--line);border-radius:2px;background:var(--ground)}
+.lagringsmerke .prikk{width:7px;height:7px;border-radius:50%;background:var(--ink-3);flex:none}
+.lagringsmerke.delt .prikk{background:var(--ok)}
+.lagringsmerke.lokal .prikk{background:var(--warn)}
+.meny-hylle{position:relative}
+.meny{position:absolute;right:0;top:calc(100% + 6px);z-index:40;min-width:240px;background:var(--surface);
+  border:1px solid var(--line-2);box-shadow:var(--skygge-hev);border-radius:2px;padding:4px;display:none}
+.meny.apen{display:block}
+.meny button{display:block;width:100%;text-align:left;padding:8px 10px;background:none;border:0;font-size:14px;border-radius:2px}
+.meny button:hover{background:var(--surface-2)}
+.meny hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+
+/* ── statistikklinje ───────────────────────────────────────── */
+.statlinje{max-width:1240px;margin:0 auto;padding:0 20px}
+.statlinje ul{display:flex;flex-wrap:wrap;gap:0 22px;list-style:none;margin:0;padding:12px 0 0;
+  font-size:13px;color:var(--ink-2)}
+.statlinje li{display:flex;align-items:baseline;gap:6px}
+.statlinje b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;color:var(--ink);font-size:14px}
+.statlinje li+li{padding-left:22px;border-left:1px solid var(--line)}
+
+/* ── ramme ─────────────────────────────────────────────────── */
+.ramme{max-width:1240px;margin:0 auto;padding:20px;display:grid;grid-template-columns:224px minmax(0,1fr);gap:32px;
+  align-items:start}
+nav.skinne{position:sticky;top:82px;display:flex;flex-direction:column;gap:20px}
+.skinne-bolk h2{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.skinne-bolk.juridisk h2{color:var(--juridisk)}
+.skinne-bolk.forretningsstotte h2{color:var(--forretningsstotte)}
+.skinne-lenke{display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;padding:5px 8px;background:none;
+  border:0;border-left:2px solid transparent;font-size:13.5px;color:var(--ink-2);border-radius:0 2px 2px 0}
+.skinne-lenke:hover{background:var(--surface-2);color:var(--ink)}
+.skinne-lenke.pa{color:var(--ink);font-weight:600;border-left-color:var(--accent);background:var(--surface-2)}
+.skinne-lenke .n{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.skinne-fot{font-size:12px;color:var(--ink-3);line-height:1.6;border-top:1px solid var(--line);padding-top:12px}
+.skinne-fot code{font-family:var(--mono);font-size:11px}
+
+/* ── filterknapper ─────────────────────────────────────────── */
+.filterrad{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:22px}
+.filterrad .etikett{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  margin-right:2px}
+.filterrad .etikett+.etikett,.filterrad .knapp+.etikett{margin-left:10px}
+.pille{padding:4px 10px;background:var(--surface);border:1px solid var(--line-2);border-radius:99px;font-size:12.5px;
+  color:var(--ink-2)}
+.pille:hover{border-color:var(--ink-3);color:var(--ink)}
+.pille.pa{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.nullstill{background:none;border:0;font-size:12.5px;color:var(--ink-3);text-decoration:underline;padding:4px}
+
+/* ── gruppe + rader ────────────────────────────────────────── */
+.gruppe{margin-bottom:34px}
+.gruppe-hode{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.gruppe-hode h3{font-size:17px}
+.gruppe-hode .ntall{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.gruppe-hode .dom{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  margin-left:auto;color:var(--ink-3)}
+.gruppe>p.gruppe-tekst{margin:0 0 12px;font-size:13.5px;color:var(--ink-2);max-width:62ch}
+.rader{border-top:1px solid var(--line)}
+.rad{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 18px;width:100%;text-align:left;
+  padding:13px 14px 13px 12px;background:none;border:0;border-bottom:1px solid var(--line);border-left:3px solid transparent;
+  align-items:center}
+.rad:hover{background:var(--surface);border-left-color:var(--dom-farge,var(--accent))}
+.rad.valgt{background:var(--surface);border-left-color:var(--dom-farge,var(--accent));box-shadow:var(--skygge)}
+.rad-navn{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.rad-navn strong{font-family:var(--serif);font-size:16.5px;font-weight:600;letter-spacing:-.005em}
+.rad-navn .id{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.rad-tagline{grid-column:1;font-size:13.5px;color:var(--ink-2);max-width:72ch}
+.rad-merker{grid-column:2;grid-row:1/span 2;display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.merkelapp{font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;padding:3px 7px;border:1px solid var(--line-2);
+  border-radius:2px;color:var(--ink-2);white-space:nowrap}
+.merkelapp.status-i-drift{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.merkelapp.status-pilot{color:var(--warn);border-color:var(--warn);background:var(--warn-soft)}
+.merkelapp.status-ide{color:var(--ink-3)}
+.merkelapp.aut{background:var(--surface-2)}
+.tom{padding:40px 14px;text-align:center;color:var(--ink-2);font-size:14px;border:1px dashed var(--line-2)}
+.skjultlinje{font-size:12.5px;color:var(--ink-3);padding:10px 0}
+.skjultlinje button{background:none;border:0;color:var(--accent);text-decoration:underline;font-size:12.5px;padding:0}
+
+/* ── panel (detalj + redigering) ───────────────────────────── */
+.duk{position:fixed;inset:0;z-index:50;background:rgba(20,32,31,.45);display:none}
+.duk.apen{display:block}
+.panel{position:fixed;top:0;right:0;bottom:0;z-index:60;width:min(620px,100%);background:var(--surface);
+  border-left:1px solid var(--line-2);box-shadow:var(--skygge-hev);display:none;flex-direction:column}
+.panel.apen{display:flex}
+.panel-hode{padding:18px 22px 14px;border-bottom:1px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.panel-hode .lukk{flex:none;background:none;border:1px solid var(--line-2);border-radius:2px;width:30px;height:30px;
+  line-height:1;font-size:16px;color:var(--ink-2)}
+.panel-hode .lukk:hover{border-color:var(--ink-3);color:var(--ink)}
+.panel-hode h2{font-size:22px;letter-spacing:-.01em;margin-bottom:3px}
+.panel-hode .id{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.panel-kropp{overflow-y:auto;padding:20px 22px 30px;flex:1}
+.panel-fot{padding:12px 22px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;background:var(--ground)}
+.panel-fot .hoyre{margin-left:auto;display:flex;gap:8px}
+.ledetekst{font-size:15px;color:var(--ink-2);font-family:var(--serif);font-size:16px;line-height:1.5;margin:0 0 18px}
+.meta{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 16px;font-size:13.5px;margin:0 0 22px;
+  padding:14px 16px;background:var(--ground);border:1px solid var(--line)}
+.meta dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  padding-top:2px}
+.meta dd{margin:0}
+.meta dd .hint{display:block;font-size:12.5px;color:var(--ink-3)}
+.bolk{margin-bottom:22px}
+.bolk h3{font-size:12px;font-family:var(--mono);font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+.bolk p{margin:0 0 10px;max-width:66ch}
+.bolk ul,.bolk ol{margin:0 0 10px;padding-left:20px}
+.bolk li{margin-bottom:5px;max-width:64ch}
+.bolk code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+.stikkord{display:flex;flex-wrap:wrap;gap:6px}
+.stikkord span{font-family:var(--mono);font-size:11px;color:var(--ink-2);background:var(--surface-2);
+  padding:3px 8px;border-radius:2px}
+
+/* ── skjema ────────────────────────────────────────────────── */
+.felt{margin-bottom:16px}
+.felt>label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:5px}
+.felt input[type=text],.felt select,.felt textarea{width:100%;padding:8px 10px;background:var(--ground);
+  border:1px solid var(--line-2);border-radius:2px;font-size:14px}
+.felt textarea{resize:vertical;min-height:76px;line-height:1.55}
+.felt .hjelp{font-size:12px;color:var(--ink-3);margin-top:4px}
+.felt-par{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.seksjon-kort{border:1px solid var(--line);background:var(--ground);padding:12px;margin-bottom:10px}
+.seksjon-kort .kort-topp{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.seksjon-kort .kort-topp input{flex:1;padding:6px 8px;background:var(--surface);border:1px solid var(--line-2);
+  border-radius:2px;font-family:var(--serif);font-size:15px;font-weight:600}
+.mini{width:28px;height:28px;flex:none;background:var(--surface);border:1px solid var(--line-2);border-radius:2px;
+  font-size:13px;line-height:1;color:var(--ink-2)}
+.mini:hover{border-color:var(--ink-3);color:var(--ink)}
+.varsel{padding:10px 12px;border:1px solid var(--warn);background:var(--warn-soft);color:var(--ink);font-size:13px;
+  margin-bottom:16px}
+.varsel.fare{border-color:var(--crit);background:var(--crit-soft)}
+
+/* ── skål (toast) ──────────────────────────────────────────── */
+#skal{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:90;display:flex;flex-direction:column;
+  gap:8px;align-items:center;pointer-events:none;width:calc(100% - 32px);max-width:460px}
+.skal-melding{background:var(--ink);color:var(--ground);padding:10px 16px;border-radius:2px;font-size:13.5px;
+  box-shadow:var(--skygge-hev);text-align:center}
+.skal-melding.feil{background:var(--crit);color:#FFF}
+
+@media (max-width:880px){
+  .ramme{grid-template-columns:minmax(0,1fr);gap:18px;padding:16px}
+  nav.skinne{position:static;flex-direction:row;overflow-x:auto;gap:22px;padding-bottom:6px;
+    border-bottom:1px solid var(--line)}
+  .skinne-bolk{min-width:200px}
+  .skinne-fot{display:none}
+  .merke{margin-right:0;width:100%}
+  .sok{flex:1 1 100%}
+  .panel{width:100%;border-left:0}
+  .rad{grid-template-columns:minmax(0,1fr)}
+  .rad-merker{grid-column:1;grid-row:auto;justify-content:flex-start}
+  .felt-par{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:no-preference){
+  .rad,.pille,.knapp,.skinne-lenke{transition:background-color .12s ease,border-color .12s ease,color .12s ease}
+}
+</style>
+</head>
+<body>
+<header class="topp">
+  <div class="topp-rad">
+    <div class="merke">
+      <h1>Agentkatalog</h1>
+      <span class="undertekst">Wiersholm</span>
+    </div>
+    <div class="sok">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 10l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input id="sok" type="text" placeholder="Søk i navn, oppdrag, stikkord …" autocomplete="off" aria-label="Søk i katalogen">
+    </div>
+    <span class="lagringsmerke" id="lagringsmerke" title="Hvor endringer lagres"><span class="prikk"></span><span id="lagringstekst">kobler til …</span></span>
+    <button class="knapp primar" id="ny-agent">Ny agent</button>
+    <div class="meny-hylle">
+      <button class="knapp" id="meny-knapp" aria-haspopup="true" aria-expanded="false" aria-label="Flere valg">···</button>
+      <div class="meny" id="meny" role="menu">
+        <button id="m-eksport" role="menuitem">Eksporter katalogen (JSON)</button>
+        <button id="m-import" role="menuitem">Importer fra JSON …</button>
+        <button id="m-alle-md" role="menuitem">Alle agenter som Markdown</button>
+        <hr>
+        <button id="m-tema" role="menuitem">Bytt lyst / mørkt</button>
+        <button id="m-tilbakestill" role="menuitem">Tilbakestill mine endringer</button>
+      </div>
+    </div>
+  </div>
+  <div class="statlinje"><ul id="statlinje"></ul></div>
+</header>
+
+<div class="ramme">
+  <nav class="skinne" id="skinne" aria-label="Domener og grupper"></nav>
+  <main>
+    <div class="filterrad" id="filterrad"></div>
+    <div id="liste"></div>
+  </main>
+</div>
+
+<div class="duk" id="duk"></div>
+<aside class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panel-tittel" tabindex="-1"></aside>
+<div id="skal" role="status" aria-live="polite"></div>
+
+<script src="agents.data.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ═══ katalogdata ══════════════════════════════════════════════════════ */
+const KAT = window.WIERSHOLM_KATALOG;
+const COLL = "agenter";
+const LS = "wiersholm.agentkatalog.v1";
+const LS_TEMA = "wiersholm.agentkatalog.tema";
+
+const GRUNNLAG = new Map(KAT.agenter.map(a => [a.id, a]));
+/* Rekkefølgen i datafilen er arbeidsrekkefølge, ikke alfabetisk — den beholdes. */
+const REKKE = new Map(KAT.agenter.map((a, i) => [a.id, i]));
+const DOMENE = new Map(KAT.domener.map(d => [d.id, d]));
+const GRUPPE = new Map();
+KAT.domener.forEach(d => d.grupper.forEach((g, i) => GRUPPE.set(d.id + "/" + g.id, { ...g, domene: d.id, rekke: i })));
+const STATUS = new Map(KAT.statuser.map(s => [s.id, s]));
+const AUTORITET = new Map(KAT.autoriteter.map(s => [s.id, s]));
+const KONFID = new Map(KAT.konfidensialitet.map(s => [s.id, s]));
+
+const STANDARDSEKSJONER = ["Oppdrag", "Arbeidsmåte", "Prosess", "Kvalitetskrav", "Vokterregler", "Overlevering"];
+
+/* ═══ tilstand ═════════════════════════════════════════════════════════ */
+const state = {
+  sok: "", domene: "alle", gruppe: null,
+  status: new Set(), autoritet: new Set(),
+  valgt: null, modus: null, utkast: null, visSkjulte: false
+};
+const lager = { db: null, modus: "venter", endringer: {} };
+
+/* ═══ hjelpere ═════════════════════════════════════════════════════════ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function slugg(s){
+  return String(s || "").toLowerCase()
+    .replace(/æ/g, "ae").replace(/ø/g, "o").replace(/å/g, "a")
+    .replace(/[äàáâ]/g, "a").replace(/[öòóô]/g, "o").replace(/[éèê]/g, "e").replace(/[üù]/g, "u")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+}
+
+function skal(tekst, feil){
+  const d = document.createElement("div");
+  d.className = "skal-melding" + (feil ? " feil" : "");
+  d.textContent = tekst;
+  $("#skal").appendChild(d);
+  setTimeout(() => d.remove(), feil ? 6500 : 3600);
+}
+
+/* Minimal markdown: avsnitt, punktlister, nummererte lister, **fet**, `kode`. */
+function mdInline(t){
+  return esc(t)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+}
+function mdBlokk(tekst){
+  const linjer = String(tekst || "").split("\n");
+  const ut = [];
+  let liste = null, avsnitt = [];
+  const lukkAvsnitt = () => { if (avsnitt.length) { ut.push("<p>" + mdInline(avsnitt.join(" ")) + "</p>"); avsnitt = []; } };
+  const lukkListe = () => { if (liste) { ut.push("</" + liste + ">"); liste = null; } };
+  for (const linje of linjer){
+    const l = linje.trim();
+    const pkt = l.match(/^[-•]\s+(.*)$/);
+    const num = l.match(/^\d+[.)]\s+(.*)$/);
+    if (pkt){
+      lukkAvsnitt();
+      if (liste !== "ul"){ lukkListe(); ut.push("<ul>"); liste = "ul"; }
+      ut.push("<li>" + mdInline(pkt[1]) + "</li>");
+    } else if (num){
+      lukkAvsnitt();
+      if (liste !== "ol"){ lukkListe(); ut.push("<ol>"); liste = "ol"; }
+      ut.push("<li>" + mdInline(num[1]) + "</li>");
+    } else if (!l){
+      lukkAvsnitt(); lukkListe();
+    } else {
+      lukkListe(); avsnitt.push(l);
+    }
+  }
+  lukkAvsnitt(); lukkListe();
+  return ut.join("");
+}
+
+/* ═══ sammenslåing av grunnlag og endringer ════════════════════════════ */
+function alleAgenter(){
+  const kart = new Map();
+  GRUNNLAG.forEach((a, id) => kart.set(id, a));
+  Object.keys(lager.endringer).forEach(id => {
+    const e = lager.endringer[id];
+    if (!e) return;
+    if (e._slettet) kart.delete(id); else kart.set(id, e);
+  });
+  const liste = [...kart.values()];
+  liste.sort((a, b) => {
+    const ga = GRUPPE.get(a.domain + "/" + a.group), gb = GRUPPE.get(b.domain + "/" + b.group);
+    const da = DOMENE.get(a.domain) ? KAT.domener.findIndex(d => d.id === a.domain) : 99;
+    const db2 = DOMENE.get(b.domain) ? KAT.domener.findIndex(d => d.id === b.domain) : 99;
+    if (da !== db2) return da - db2;
+    const ra = ga ? ga.rekke : 99, rb = gb ? gb.rekke : 99;
+    if (ra !== rb) return ra - rb;
+    const na = REKKE.has(a.id) ? REKKE.get(a.id) : 1e4, nb = REKKE.has(b.id) ? REKKE.get(b.id) : 1e4;
+    if (na !== nb) return na - nb;
+    return String(a.name).localeCompare(String(b.name), "nb");
+  });
+  return liste;
+}
+function skjulte(){
+  return Object.keys(lager.endringer)
+    .filter(id => lager.endringer[id] && lager.endringer[id]._slettet && GRUNNLAG.has(id))
+    .map(id => GRUNNLAG.get(id));
+}
+function hentAgent(id){
+  const e = lager.endringer[id];
+  if (e && !e._slettet) return e;
+  if (e && e._slettet) return null;
+  return GRUNNLAG.get(id) || null;
+}
+function erEndret(id){
+  const e = lager.endringer[id];
+  return !!(e && !e._slettet);
+}
+
+function treffer(a){
+  if (state.domene !== "alle" && a.domain !== state.domene) return false;
+  if (state.gruppe && a.domain + "/" + a.group !== state.gruppe) return false;
+  if (state.status.size && !state.status.has(a.status)) return false;
+  if (state.autoritet.size && !state.autoritet.has(a.authority)) return false;
+  if (state.sok){
+    const q = state.sok.toLowerCase();
+    const hoystakk = [a.name, a.id, a.tagline, a.owner, a.signoff,
+      (a.tags || []).join(" "), (a.systems || []).join(" "),
+      (a.inputs || []).join(" "), (a.outputs || []).join(" "),
+      (a.sections || []).map(s => s.title + " " + s.body).join(" ")].join(" ").toLowerCase();
+    if (!hoystakk.includes(q)) return false;
+  }
+  return true;
+}
+
+/* ═══ lagring ══════════════════════════════════════════════════════════ */
+function lokaltLagre(){
+  try { localStorage.setItem(LS, JSON.stringify(lager.endringer)); } catch (e) { /* privat vindu */ }
+}
+function lokaltLese(){
+  try { return JSON.parse(localStorage.getItem(LS) || "{}") || {}; } catch (e) { return {}; }
+}
+function settLagringsmerke(){
+  const el = $("#lagringsmerke");
+  const tekst = { venter: "kobler til …", delt: "lagres for hele firmaet", lokal: "lagres i denne nettleseren" }[lager.modus];
+  const tittel = {
+    venter: "Sjekker om katalogen kan lagre delt.",
+    delt: "Endringer lagres i katalogens delte database og er synlige for alle i Wiersholm som åpner siden.",
+    lokal: "Ingen delt lagring tilgjengelig her. Endringer ligger bare i denne nettleseren — bruk Eksporter for å ta dem med."
+  }[lager.modus];
+  el.className = "lagringsmerke " + lager.modus;
+  el.title = tittel;
+  $("#lagringstekst").textContent = tekst;
+}
+
+async function lagre(post){
+  post.endret = new Date().toISOString();
+  if (lager.db){
+    try {
+      await lager.db.doc(COLL + "/" + post.id).set(post);
+      return true;
+    } catch (e){
+      lager.endringer[post.id] = post; lokaltLagre(); tegn();
+      skal("Kunne ikke lagre delt (" + (e && e.code ? e.code : "ukjent") + "). Lagret i denne nettleseren i stedet.", true);
+      return true;
+    }
+  }
+  lager.endringer[post.id] = post; lokaltLagre(); tegn();
+  return true;
+}
+
+async function fjern(id){
+  const erGrunnlag = GRUNNLAG.has(id);
+  if (lager.db){
+    try {
+      if (erGrunnlag) await lager.db.doc(COLL + "/" + id).set({ id: id, _slettet: true, endret: new Date().toISOString() });
+      else await lager.db.doc(COLL + "/" + id).delete();
+      return;
+    } catch (e){
+      skal("Kunne ikke slette delt (" + (e && e.code ? e.code : "ukjent") + "). Skjult i denne nettleseren.", true);
+    }
+  }
+  if (erGrunnlag) lager.endringer[id] = { id: id, _slettet: true };
+  else delete lager.endringer[id];
+  lokaltLagre(); tegn();
+}
+
+async function gjenopprett(id){
+  if (lager.db){
+    try { await lager.db.doc(COLL + "/" + id).delete(); return; }
+    catch (e){ skal("Kunne ikke gjenopprette delt (" + (e && e.code ? e.code : "ukjent") + ").", true); }
+  }
+  delete lager.endringer[id]; lokaltLagre(); tegn();
+}
+
+async function koblePaDb(){
+  let db = null;
+  try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; }
+  catch (e){ db = null; }
+  if (!db){ lager.modus = "lokal"; settLagringsmerke(); return; }
+  lager.db = db;
+  lager.modus = "delt";
+  settLagringsmerke();
+  db.collection(COLL).onSnapshot(snap => {
+    const nye = {};
+    snap.docs.forEach(d => { const v = d.data(); if (v) nye[d.id] = v; });
+    lager.endringer = nye;
+    lokaltLagre();
+    tegn();
+    if (state.valgt && state.modus === "les") apnePanel(state.valgt, "les");
+  }, err => {
+    lager.db = null;
+    lager.modus = "lokal";
+    settLagringsmerke();
+    if (err && err.code !== "revoked") skal("Mistet delt lagring (" + err.code + "). Endringer lagres nå lokalt.", true);
+  });
+}
+
+/* ═══ eksport ══════════════════════════════════════════════════════════ */
+function tilMarkdown(a){
+  const liste = v => "[" + (v || []).map(x => /[:#,\[\]]/.test(x) ? '"' + x + '"' : x).join(", ") + "]";
+  const l = [];
+  l.push("---");
+  l.push("id: " + a.id);
+  l.push("kind: ai-role");
+  l.push("domain: " + a.domain);
+  l.push("group: " + a.group);
+  l.push("status: " + a.status);
+  l.push("authority: " + a.authority);
+  l.push("signoff: " + JSON.stringify(a.signoff || ""));
+  l.push("confidentiality: " + a.confidentiality);
+  l.push("owner: " + JSON.stringify(a.owner || ""));
+  l.push("systems: " + liste(a.systems));
+  l.push("reads: " + liste(a.inputs));
+  l.push("writes: " + liste(a.outputs));
+  l.push("tags: " + liste(a.tags));
+  l.push("---");
+  l.push("");
+  l.push("# " + a.name);
+  l.push("");
+  l.push("> " + (a.tagline || ""));
+  (a.sections || []).forEach(s => { l.push(""); l.push("## " + s.title); l.push(""); l.push(s.body); });
+  if ((a.inputs || []).length){ l.push(""); l.push("## Input"); l.push(""); a.inputs.forEach(i => l.push("- " + i)); }
+  if ((a.outputs || []).length){ l.push(""); l.push("## Leveranse"); l.push(""); a.outputs.forEach(i => l.push("- " + i)); }
+  l.push("");
+  return l.join("\n");
+}
+
+function tilSystemprompt(a){
+  const d = DOMENE.get(a.domain), g = GRUPPE.get(a.domain + "/" + a.group);
+  const aut = AUTORITET.get(a.authority);
+  const l = [];
+  l.push("Du er «" + a.name + "» — en agent i Wiersholms agentkatalog.");
+  l.push("Domene: " + (d ? d.navn : a.domain) + " · Gruppe: " + (g ? g.navn : a.group) + ".");
+  l.push("Kort: " + (a.tagline || ""));
+  l.push("");
+  l.push("Autoritet: " + (aut ? aut.navn + " — " + aut.beskrivelse : a.authority));
+  l.push("Godkjennes av: " + (a.signoff || "ansvarlig advokat") + ". Ingenting du produserer går ut av huset uten dette.");
+  l.push("");
+  if ((a.inputs || []).length){ l.push("DU FÅR:"); a.inputs.forEach(i => l.push("- " + i)); l.push(""); }
+  if ((a.outputs || []).length){ l.push("DU LEVERER:"); a.outputs.forEach(i => l.push("- " + i)); l.push(""); }
+  (a.sections || []).forEach(s => { l.push(s.title.toUpperCase() + ":"); l.push(s.body); l.push(""); });
+  l.push("STÅENDE REGLER:");
+  l.push("- Taushetsplikten går foran alt. Klientidentifiserbare opplysninger behandles bare i godkjent miljø.");
+  l.push("- Du oppgir kilden til alt du hevder, og sier eksplisitt hva du ikke vet.");
+  l.push("- Du strekker ikke mandatet. Ser du noe utenfor oppdraget, flagger du det som eget punkt.");
+  l.push("- Er saken ny, prinsipiell eller stor: eskaler til menneske framfor å konkludere.");
+  return l.join("\n");
+}
+
+function tekstpanel(tittel, tekst, filnavn){
+  const p = $("#panel");
+  p.innerHTML =
+    '<div class="panel-hode"><div style="flex:1"><h2 id="panel-tittel">' + esc(tittel) + '</h2>' +
+    '<span class="id">' + esc(filnavn || "") + '</span></div>' +
+    '<button class="lukk" id="p-lukk" aria-label="Lukk">×</button></div>' +
+    '<div class="panel-kropp"><div class="felt"><textarea id="p-tekst" rows="22" spellcheck="false" ' +
+    'style="font-family:var(--mono);font-size:12.5px">' + esc(tekst) + '</textarea></div></div>' +
+    '<div class="panel-fot"><button class="knapp primar" id="p-kopier">Kopier</button>' +
+    (filnavn ? '<button class="knapp" id="p-last">Last ned</button>' : "") +
+    '<div class="hoyre"><button class="knapp" id="p-tilbake">' +
+    (state.valgt && hentAgent(state.valgt) ? "Tilbake" : "Lukk") + "</button></div></div>";
+  const tilbakeTil = state.valgt && hentAgent(state.valgt) ? state.valgt : null;
+  apne();
+  $("#p-lukk").onclick = lukk;
+  $("#p-tilbake").onclick = () => { if (tilbakeTil) apnePanel(tilbakeTil, "les"); else lukk(); };
+  $("#p-kopier").onclick = async () => {
+    try { await navigator.clipboard.writeText(tekst); skal("Kopiert."); }
+    catch (e){ $("#p-tekst").select(); skal("Merket. Bruk Ctrl/Cmd + C.", true); }
+  };
+  const last = $("#p-last");
+  if (last) last.onclick = () => lastNed(filnavn, tekst);
+}
+
+async function lastNed(filnavn, tekst){
+  let dl = null;
+  try { dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null; }
+  catch (e){ dl = null; }
+  if (dl){
+    try { await dl.save({ filename: filnavn, data: tekst }); skal("Lagret " + filnavn + "."); return; }
+    catch (e){
+      if (e && e.code === "declined") return;
+      skal("Nedlasting feilet (" + (e && e.code ? e.code : "ukjent") + "). Bruk Kopier.", true);
+      return;
+    }
+  }
+  try {
+    const url = URL.createObjectURL(new Blob([tekst], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = filnavn; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  } catch (e){ skal("Nedlasting er ikke tilgjengelig her. Bruk Kopier.", true); }
+}
+
+/* ═══ tegning: statistikk, skinne, filtre, liste ═══════════════════════ */
+function tegnStat(){
+  const alle = alleAgenter();
+  const perDomene = KAT.domener.map(d => ({ d: d, n: alle.filter(a => a.domain === d.id).length }));
+  const perStatus = KAT.statuser.map(s => ({ s: s, n: alle.filter(a => a.status === s.id).length }));
+  const deler = [];
+  deler.push("<li><b>" + alle.length + "</b> agenter</li>");
+  perDomene.forEach(x => deler.push("<li><b>" + x.n + "</b> " + esc(x.d.navn.toLowerCase()) + "</li>"));
+  perStatus.forEach(x => deler.push("<li><b>" + x.n + "</b> " + esc(x.s.navn.toLowerCase()) + "</li>"));
+  $("#statlinje").innerHTML = deler.join("");
+}
+
+function tegnSkinne(){
+  const alle = alleAgenter();
+  const bolker = [];
+  bolker.push('<div class="skinne-bolk"><h2>Katalogen</h2>' +
+    '<button class="skinne-lenke' + (state.domene === "alle" && !state.gruppe ? " pa" : "") + '" data-domene="alle">' +
+    'Alle agenter <span class="n">' + alle.length + "</span></button></div>");
+  KAT.domener.forEach(d => {
+    const iDomene = alle.filter(a => a.domain === d.id);
+    let h = '<div class="skinne-bolk ' + d.id + '"><h2>' + esc(d.navn) + "</h2>";
+    h += '<button class="skinne-lenke' + (state.domene === d.id && !state.gruppe ? " pa" : "") + '" data-domene="' + d.id + '">' +
+      "Hele domenet <span class=\"n\">" + iDomene.length + "</span></button>";
+    d.grupper.forEach(g => {
+      const n = iDomene.filter(a => a.group === g.id).length;
+      h += '<button class="skinne-lenke' + (state.gruppe === d.id + "/" + g.id ? " pa" : "") + '" data-gruppe="' +
+        d.id + "/" + g.id + '">' + esc(g.navn) + ' <span class="n">' + n + "</span></button>";
+    });
+    h += "</div>";
+    bolker.push(h);
+  });
+  bolker.push('<div class="skinne-fot">Kilden til katalogen er <code>wiersholm/agents.data.js</code> i ' +
+    "agent-playbook. Endringer du gjør her ligger over den, og kan eksporteres tilbake.</div>");
+  const el = $("#skinne");
+  el.innerHTML = bolker.join("");
+  el.querySelectorAll("[data-domene]").forEach(b => b.onclick = () => {
+    state.domene = b.dataset.domene; state.gruppe = null; tegn();
+  });
+  el.querySelectorAll("[data-gruppe]").forEach(b => b.onclick = () => {
+    state.gruppe = b.dataset.gruppe; state.domene = b.dataset.gruppe.split("/")[0]; tegn();
+  });
+}
+
+function tegnFiltre(){
+  const h = [];
+  h.push('<span class="etikett">Status</span>');
+  KAT.statuser.forEach(s => h.push('<button class="pille' + (state.status.has(s.id) ? " pa" : "") +
+    '" data-status="' + s.id + '" title="' + esc(s.beskrivelse) + '">' + esc(s.navn) + "</button>"));
+  h.push('<span class="etikett">Autoritet</span>');
+  KAT.autoriteter.forEach(s => h.push('<button class="pille' + (state.autoritet.has(s.id) ? " pa" : "") +
+    '" data-aut="' + s.id + '" title="' + esc(s.beskrivelse) + '">' + esc(s.navn) + "</button>"));
+  const aktivt = state.status.size || state.autoritet.size || state.sok || state.gruppe || state.domene !== "alle";
+  if (aktivt) h.push('<button class="nullstill" id="f-nullstill">Nullstill filter</button>');
+  const el = $("#filterrad");
+  el.innerHTML = h.join("");
+  el.querySelectorAll("[data-status]").forEach(b => b.onclick = () => {
+    const v = b.dataset.status;
+    state.status.has(v) ? state.status.delete(v) : state.status.add(v); tegn();
+  });
+  el.querySelectorAll("[data-aut]").forEach(b => b.onclick = () => {
+    const v = b.dataset.aut;
+    state.autoritet.has(v) ? state.autoritet.delete(v) : state.autoritet.add(v); tegn();
+  });
+  const nz = $("#f-nullstill");
+  if (nz) nz.onclick = () => {
+    state.status.clear(); state.autoritet.clear(); state.sok = ""; state.gruppe = null; state.domene = "alle";
+    $("#sok").value = ""; tegn();
+  };
+}
+
+function radHtml(a){
+  const st = STATUS.get(a.status), aut = AUTORITET.get(a.authority);
+  return '<button class="rad' + (state.valgt === a.id ? " valgt" : "") + '" data-id="' + esc(a.id) + '" ' +
+    'style="--dom-farge:var(--' + esc(a.domain) + ')">' +
+    '<span class="rad-navn"><strong>' + esc(a.name) + "</strong>" +
+    '<span class="id">' + esc(a.id) + "</span>" +
+    (erEndret(a.id) ? '<span class="merkelapp" title="Endret i katalogen">endret</span>' : "") +
+    "</span>" +
+    '<span class="rad-tagline">' + esc(a.tagline || "") + "</span>" +
+    '<span class="rad-merker">' +
+    '<span class="merkelapp aut">' + esc(aut ? aut.navn : a.authority) + "</span>" +
+    '<span class="merkelapp status-' + esc(a.status) + '">' + esc(st ? st.navn : a.status) + "</span>" +
+    "</span></button>";
+}
+
+function tegnListe(){
+  const treff = alleAgenter().filter(treffer);
+  const el = $("#liste");
+  if (!treff.length){
+    el.innerHTML = '<div class="tom">Ingen agenter treffer filteret. ' +
+      "Prøv å nullstille, eller opprett en ny agent for det som mangler.</div>";
+    return;
+  }
+  const rekkefolge = [];
+  KAT.domener.forEach(d => d.grupper.forEach(g => rekkefolge.push(d.id + "/" + g.id)));
+  const h = [];
+  rekkefolge.forEach(nokkel => {
+    const iGruppe = treff.filter(a => a.domain + "/" + a.group === nokkel);
+    if (!iGruppe.length) return;
+    const g = GRUPPE.get(nokkel), d = DOMENE.get(g.domene);
+    h.push('<section class="gruppe"><div class="gruppe-hode"><h3>' + esc(g.navn) + "</h3>" +
+      '<span class="ntall">' + iGruppe.length + "</span>" +
+      '<span class="dom" style="color:var(--' + esc(d.id) + ')">' + esc(d.navn) + "</span></div>" +
+      '<p class="gruppe-tekst">' + esc(g.beskrivelse) + "</p>" +
+      '<div class="rader">' + iGruppe.map(radHtml).join("") + "</div></section>");
+  });
+  const ukjent = treff.filter(a => !GRUPPE.has(a.domain + "/" + a.group));
+  if (ukjent.length){
+    h.push('<section class="gruppe"><div class="gruppe-hode"><h3>Uplassert</h3>' +
+      '<span class="ntall">' + ukjent.length + "</span></div>" +
+      '<p class="gruppe-tekst">Disse agentene peker på en gruppe katalogen ikke kjenner. ' +
+      "Rediger dem og velg en gruppe.</p>" +
+      '<div class="rader">' + ukjent.map(radHtml).join("") + "</div></section>");
+  }
+  const sk = skjulte();
+  if (sk.length){
+    h.push('<div class="skjultlinje">' + sk.length + " agent" + (sk.length === 1 ? "" : "er") +
+      " fra katalogversjonen er skjult. " +
+      '<button id="vis-skjulte">' + (state.visSkjulte ? "Skjul listen" : "Vis dem") + "</button>" +
+      (state.visSkjulte ? "<div style=\"margin-top:8px;display:flex;flex-direction:column;gap:6px\">" +
+        sk.map(a => '<span>' + esc(a.name) + ' <button data-gjenopprett="' + esc(a.id) +
+          '" style="background:none;border:0;color:var(--accent);text-decoration:underline;font-size:12.5px;padding:0">' +
+          "gjenopprett</button></span>").join("") + "</div>" : "") +
+      "</div>");
+  }
+  el.innerHTML = h.join("");
+  el.querySelectorAll(".rad").forEach(b => b.onclick = () => apnePanel(b.dataset.id, "les"));
+  const vs = $("#vis-skjulte");
+  if (vs) vs.onclick = () => { state.visSkjulte = !state.visSkjulte; tegnListe(); };
+  el.querySelectorAll("[data-gjenopprett]").forEach(b => b.onclick = () => gjenopprett(b.dataset.gjenopprett));
+}
+
+function tegn(){
+  tegnStat(); tegnSkinne(); tegnFiltre(); tegnListe();
+}
+
+/* ═══ panel ════════════════════════════════════════════════════════════ */
+let forrigeFokus = null;
+function apne(){
+  if (!$("#panel").classList.contains("apen")) forrigeFokus = document.activeElement;
+  $("#duk").classList.add("apen");
+  $("#panel").classList.add("apen");
+  $("#panel").focus();
+}
+function lukk(){
+  $("#duk").classList.remove("apen");
+  $("#panel").classList.remove("apen");
+  $("#panel").innerHTML = "";
+  state.valgt = null; state.modus = null; state.utkast = null;
+  tegnListe();
+  if (forrigeFokus && forrigeFokus.focus) forrigeFokus.focus();
+}
+
+function apnePanel(id, modus){
+  const a = hentAgent(id);
+  if (!a){ lukk(); return; }
+  state.valgt = id; state.modus = modus;
+  if (modus === "rediger") tegnSkjema(JSON.parse(JSON.stringify(a)), false);
+  else tegnDetalj(a);
+  tegnListe();
+}
+
+function tegnDetalj(a){
+  const d = DOMENE.get(a.domain), g = GRUPPE.get(a.domain + "/" + a.group);
+  const st = STATUS.get(a.status), aut = AUTORITET.get(a.authority), kf = KONFID.get(a.confidentiality);
+  const h = [];
+  h.push('<div class="panel-hode"><div style="flex:1">' +
+    '<h2 id="panel-tittel">' + esc(a.name) + "</h2>" +
+    '<span class="id">' + esc(a.id) + " · " + esc(d ? d.navn : a.domain) + " / " + esc(g ? g.navn : a.group) + "</span>" +
+    "</div><button class=\"lukk\" id=\"p-lukk\" aria-label=\"Lukk\">×</button></div>");
+  h.push('<div class="panel-kropp">');
+  h.push('<p class="ledetekst">' + esc(a.tagline || "") + "</p>");
+  h.push("<dl class=\"meta\">");
+  const rad = (k, v, hint) => h.push("<dt>" + esc(k) + "</dt><dd>" + v + (hint ? '<span class="hint">' + esc(hint) + "</span>" : "") + "</dd>");
+  rad("Status", esc(st ? st.navn : a.status), st ? st.beskrivelse : "");
+  rad("Autoritet", esc(aut ? aut.navn : a.authority), aut ? aut.beskrivelse : "");
+  rad("Godkjennes av", esc(a.signoff || "—"));
+  rad("Data", esc(kf ? kf.navn : a.confidentiality), kf ? kf.beskrivelse : "");
+  rad("Eier", esc(a.owner || "—"));
+  if ((a.systems || []).length) rad("Systemer", esc(a.systems.join(" · ")));
+  if (a.endret) rad("Sist endret", '<span class="mono" style="font-size:12.5px">' + esc(String(a.endret).slice(0, 10)) + "</span>");
+  h.push("</dl>");
+  if ((a.inputs || []).length){
+    h.push('<div class="bolk"><h3>Input</h3><ul>' + a.inputs.map(i => "<li>" + mdInline(i) + "</li>").join("") + "</ul></div>");
+  }
+  if ((a.outputs || []).length){
+    h.push('<div class="bolk"><h3>Leveranse</h3><ul>' + a.outputs.map(i => "<li>" + mdInline(i) + "</li>").join("") + "</ul></div>");
+  }
+  (a.sections || []).forEach(s => {
+    h.push('<div class="bolk"><h3>' + esc(s.title) + "</h3>" + mdBlokk(s.body) + "</div>");
+  });
+  if ((a.tags || []).length){
+    h.push('<div class="bolk"><h3>Stikkord</h3><div class="stikkord">' +
+      a.tags.map(t => "<span>" + esc(t) + "</span>").join("") + "</div></div>");
+  }
+  h.push("</div>");
+  h.push('<div class="panel-fot">' +
+    '<button class="knapp primar" id="p-rediger">Rediger</button>' +
+    '<button class="knapp" id="p-dupliser">Dupliser</button>' +
+    '<button class="knapp" id="p-prompt">Systemprompt</button>' +
+    '<button class="knapp" id="p-md">Markdown</button>' +
+    '<div class="hoyre"><button class="knapp fare" id="p-slett">' +
+    (GRUNNLAG.has(a.id) ? "Skjul" : "Slett") + "</button></div></div>");
+  $("#panel").innerHTML = h.join("");
+  apne();
+  $("#p-lukk").onclick = lukk;
+  $("#p-rediger").onclick = () => apnePanel(a.id, "rediger");
+  $("#p-dupliser").onclick = () => {
+    const kopi = JSON.parse(JSON.stringify(a));
+    kopi.name = a.name + " (kopi)";
+    kopi.id = unikId(slugg(kopi.name));
+    delete kopi.endret;
+    tegnSkjema(kopi, true);
+  };
+  $("#p-prompt").onclick = () => tekstpanel("Systemprompt · " + a.name, tilSystemprompt(a), a.id + "-systemprompt.txt");
+  $("#p-md").onclick = () => tekstpanel("Markdown · " + a.name, tilMarkdown(a), a.id + ".md");
+  $("#p-slett").onclick = async () => {
+    const grunnlag = GRUNNLAG.has(a.id);
+    const sp = grunnlag
+      ? "Skjul «" + a.name + "» fra katalogen? Den ligger fortsatt i katalogversjonen og kan gjenopprettes."
+      : "Slette «" + a.name + "» for godt? Dette kan ikke angres.";
+    if (!confirm(sp)) return;
+    await fjern(a.id);
+    lukk();
+    skal(grunnlag ? "Skjult." : "Slettet.");
+  };
+}
+
+/* ═══ skjema ═══════════════════════════════════════════════════════════ */
+function unikId(basis){
+  let id = basis || "ny-agent", n = 2;
+  const finnes = x => GRUNNLAG.has(x) || (lager.endringer[x] && !lager.endringer[x]._slettet);
+  while (finnes(id)){ id = (basis || "ny-agent") + "-" + n; n++; }
+  return id;
+}
+
+function nyAgent(){
+  return {
+    id: "", name: "", domain: "juridisk", group: "kjerneleveranse", tagline: "",
+    status: "ide", authority: "utkast", signoff: "Ansvarlig advokat", confidentiality: "intern",
+    owner: "", systems: [], inputs: [], outputs: [],
+    sections: STANDARDSEKSJONER.map(t => ({ title: t, body: "" })), tags: []
+  };
+}
+
+function gruppevalg(domene, valgt){
+  const d = DOMENE.get(domene);
+  if (!d) return "";
+  return d.grupper.map(g => '<option value="' + esc(g.id) + '"' + (g.id === valgt ? " selected" : "") + ">" +
+    esc(g.navn) + "</option>").join("");
+}
+
+function tegnSkjema(post, erNy){
+  state.utkast = post; state.modus = "rediger";
+  const opprinneligId = post.id;
+  const linjer = arr => (arr || []).join("\n");
+  const valg = (kart, v) => [...kart.values()].map(x => '<option value="' + esc(x.id) + '"' +
+    (x.id === v ? " selected" : "") + ">" + esc(x.navn) + "</option>").join("");
+  const h = [];
+  h.push('<div class="panel-hode"><div style="flex:1"><h2 id="panel-tittel">' +
+    (erNy ? "Ny agent" : "Rediger agent") + "</h2>" +
+    '<span class="id" id="id-visning">' + esc(post.id || "id settes fra navnet") + "</span></div>" +
+    '<button class="lukk" id="p-lukk" aria-label="Lukk">×</button></div>');
+  h.push('<div class="panel-kropp"><form id="skjema" novalidate>');
+  if (!erNy && GRUNNLAG.has(post.id)){
+    h.push('<div class="varsel">Dette er en agent fra katalogversjonen. Endringene dine legges over den, ' +
+      "og kan rulles tilbake med «Tilbakestill mine endringer».</div>");
+  }
+  h.push('<div class="felt"><label for="f-navn">Navn</label>' +
+    '<input type="text" id="f-navn" value="' + esc(post.name) + '" placeholder="Kontraktsgjennomgang"></div>');
+  h.push('<div class="felt"><label for="f-id">Id</label>' +
+    '<input type="text" id="f-id" value="' + esc(post.id) + '" placeholder="kontraktsgjennomgang">' +
+    '<div class="hjelp">Små bokstaver, tall og bindestrek. Brukes som filnavn og i overleveringer.</div></div>');
+  h.push('<div class="felt"><label for="f-tagline">Én linje om hva den gjør</label>' +
+    '<input type="text" id="f-tagline" value="' + esc(post.tagline) + '" ' +
+    'placeholder="Måler avtalen mot husets posisjonsnotat og viser hvor vi har gitt oss."></div>');
+  h.push('<div class="felt-par">' +
+    '<div class="felt"><label for="f-domene">Domene</label><select id="f-domene">' +
+    KAT.domener.map(d => '<option value="' + esc(d.id) + '"' + (d.id === post.domain ? " selected" : "") + ">" +
+      esc(d.navn) + "</option>").join("") + "</select></div>" +
+    '<div class="felt"><label for="f-gruppe">Gruppe</label><select id="f-gruppe">' +
+    gruppevalg(post.domain, post.group) + "</select></div></div>");
+  h.push('<div class="felt-par">' +
+    '<div class="felt"><label for="f-status">Status</label><select id="f-status">' + valg(STATUS, post.status) + "</select></div>" +
+    '<div class="felt"><label for="f-aut">Autoritet</label><select id="f-aut">' + valg(AUTORITET, post.authority) + "</select></div></div>");
+  h.push('<div class="felt-par">' +
+    '<div class="felt"><label for="f-konf">Data den kan se</label><select id="f-konf">' + valg(KONFID, post.confidentiality) + "</select></div>" +
+    '<div class="felt"><label for="f-signoff">Godkjennes av</label>' +
+    '<input type="text" id="f-signoff" value="' + esc(post.signoff) + '" placeholder="Ansvarlig advokat"></div></div>');
+  h.push('<div class="felt-par">' +
+    '<div class="felt"><label for="f-eier">Eier</label>' +
+    '<input type="text" id="f-eier" value="' + esc(post.owner) + '" placeholder="Fagavdelingen"></div>' +
+    '<div class="felt"><label for="f-stikkord">Stikkord</label>' +
+    '<input type="text" id="f-stikkord" value="' + esc((post.tags || []).join(", ")) + '" placeholder="kontrakt, forhandling"></div></div>');
+  h.push('<div class="felt"><label for="f-systemer">Systemer</label>' +
+    '<textarea id="f-systemer" rows="3" placeholder="iManage&#10;Lovdata Pro">' + esc(linjer(post.systems)) + "</textarea>" +
+    '<div class="hjelp">Ett per linje.</div></div>');
+  h.push('<div class="felt"><label for="f-input">Input</label>' +
+    '<textarea id="f-input" rows="4">' + esc(linjer(post.inputs)) + "</textarea>" +
+    '<div class="hjelp">Ett punkt per linje. Hva agenten må få for å kunne gjøre jobben.</div></div>');
+  h.push('<div class="felt"><label for="f-leveranse">Leveranse</label>' +
+    '<textarea id="f-leveranse" rows="4">' + esc(linjer(post.outputs)) + "</textarea>" +
+    '<div class="hjelp">Ett punkt per linje. Hva som faktisk kommer ut.</div></div>');
+  h.push('<div class="felt"><label>Seksjoner</label><div id="seksjoner"></div>' +
+    '<button type="button" class="knapp" id="f-ny-seksjon">Legg til seksjon</button>' +
+    '<div class="hjelp">Punktlister med «- » og nummererte lister med «1. » blir formatert.</div></div>');
+  h.push("</form></div>");
+  h.push('<div class="panel-fot"><button class="knapp primar" id="f-lagre">' +
+    (erNy ? "Opprett agent" : "Lagre endringer") + "</button>" +
+    '<div class="hoyre"><button class="knapp" id="f-avbryt">Avbryt</button></div></div>');
+  $("#panel").innerHTML = h.join("");
+  apne();
+
+  tegnSeksjoner();
+  const navn = $("#f-navn"), idFelt = $("#f-id");
+  let idBerort = !!post.id;
+  idFelt.addEventListener("input", () => { idBerort = true; idFelt.value = slugg(idFelt.value); oppdaterIdVisning(); });
+  navn.addEventListener("input", () => {
+    if (!idBerort){ idFelt.value = slugg(navn.value); oppdaterIdVisning(); }
+  });
+  function oppdaterIdVisning(){ $("#id-visning").textContent = idFelt.value || "id settes fra navnet"; }
+  $("#f-domene").onchange = () => { $("#f-gruppe").innerHTML = gruppevalg($("#f-domene").value, null); };
+  $("#f-ny-seksjon").onclick = () => { state.utkast.sections.push({ title: "", body: "" }); lesSkjema(); tegnSeksjoner(); };
+  $("#p-lukk").onclick = $("#f-avbryt").onclick = () => {
+    if (erNy || !opprinneligId) lukk(); else apnePanel(opprinneligId, "les");
+  };
+  $("#f-lagre").onclick = async () => {
+    const p = lesSkjema();
+    if (!p.name.trim()){ skal("Agenten må ha et navn.", true); $("#f-navn").focus(); return; }
+    if (!p.id){ p.id = unikId(slugg(p.name)); }
+    if (p.id !== opprinneligId){
+      const kollisjon = GRUNNLAG.has(p.id) || (lager.endringer[p.id] && !lager.endringer[p.id]._slettet);
+      if (kollisjon){ skal("Id-en «" + p.id + "» er tatt. Velg en annen.", true); $("#f-id").focus(); return; }
+    }
+    p.sections = (p.sections || []).filter(s => s.title.trim() || s.body.trim());
+    if (!erNy && opprinneligId && p.id !== opprinneligId) await fjern(opprinneligId);
+    await lagre(p);
+    if (!lager.db) skal(erNy ? "Opprettet — lagret i denne nettleseren." : "Lagret i denne nettleseren.");
+    else skal(erNy ? "Opprettet." : "Lagret.");
+    apnePanel(p.id, "les");
+  };
+
+  function tegnSeksjoner(){
+    const beholder = $("#seksjoner");
+    beholder.innerHTML = state.utkast.sections.map((s, i) =>
+      '<div class="seksjon-kort"><div class="kort-topp">' +
+      '<input type="text" class="s-tittel" data-i="' + i + '" value="' + esc(s.title) + '" placeholder="Overskrift" ' +
+      'aria-label="Overskrift for seksjon ' + (i + 1) + '">' +
+      '<button type="button" class="mini" data-opp="' + i + '" aria-label="Flytt opp"' + (i === 0 ? " disabled" : "") + ">↑</button>" +
+      '<button type="button" class="mini" data-ned="' + i + '" aria-label="Flytt ned"' +
+      (i === state.utkast.sections.length - 1 ? " disabled" : "") + ">↓</button>" +
+      '<button type="button" class="mini" data-vekk="' + i + '" aria-label="Fjern seksjon">×</button>' +
+      "</div>" +
+      '<textarea class="s-kropp" data-i="' + i + '" rows="5" aria-label="Innhold i seksjon ' + (i + 1) + '">' +
+      esc(s.body) + "</textarea></div>").join("");
+    beholder.querySelectorAll("[data-opp]").forEach(b => b.onclick = () => flytt(+b.dataset.opp, -1));
+    beholder.querySelectorAll("[data-ned]").forEach(b => b.onclick = () => flytt(+b.dataset.ned, 1));
+    beholder.querySelectorAll("[data-vekk]").forEach(b => b.onclick = () => {
+      lesSkjema(); state.utkast.sections.splice(+b.dataset.vekk, 1); tegnSeksjoner();
+    });
+  }
+  function flytt(i, retning){
+    lesSkjema();
+    const j = i + retning;
+    const s = state.utkast.sections;
+    if (j < 0 || j >= s.length) return;
+    const t = s[i]; s[i] = s[j]; s[j] = t;
+    tegnSeksjoner();
+  }
+  function lesSkjema(){
+    const tilArr = v => String(v || "").split("\n").map(x => x.trim()).filter(Boolean);
+    const p = state.utkast;
+    p.name = $("#f-navn").value.trim();
+    p.id = slugg($("#f-id").value);
+    p.tagline = $("#f-tagline").value.trim();
+    p.domain = $("#f-domene").value;
+    p.group = $("#f-gruppe").value;
+    p.status = $("#f-status").value;
+    p.authority = $("#f-aut").value;
+    p.confidentiality = $("#f-konf").value;
+    p.signoff = $("#f-signoff").value.trim();
+    p.owner = $("#f-eier").value.trim();
+    p.tags = $("#f-stikkord").value.split(",").map(x => x.trim()).filter(Boolean);
+    p.systems = tilArr($("#f-systemer").value);
+    p.inputs = tilArr($("#f-input").value);
+    p.outputs = tilArr($("#f-leveranse").value);
+    p.sections = state.utkast.sections.map((s, i) => {
+      const t = document.querySelector('.s-tittel[data-i="' + i + '"]');
+      const k = document.querySelector('.s-kropp[data-i="' + i + '"]');
+      return { title: t ? t.value.trim() : s.title, body: k ? k.value : s.body };
+    });
+    return p;
+  }
+}
+
+/* ═══ import og eksport ════════════════════════════════════════════════ */
+function eksporter(){
+  const data = { versjon: KAT.versjon, eksportert: new Date().toISOString(), agenter: alleAgenter() };
+  tekstpanel("Eksport av katalogen", JSON.stringify(data, null, 2), "wiersholm-agentkatalog.json");
+}
+function alleSomMarkdown(){
+  const alle = alleAgenter();
+  const tekst = alle.map(tilMarkdown).join("\n\n<!-- ─────────────────────────────── -->\n\n");
+  tekstpanel("Alle agenter som Markdown", tekst, "wiersholm-agenter.md");
+}
+function importer(){
+  const inn = document.createElement("input");
+  inn.type = "file"; inn.accept = ".json,application/json";
+  inn.onchange = async () => {
+    const fil = inn.files && inn.files[0];
+    if (!fil) return;
+    let data;
+    try { data = JSON.parse(await fil.text()); }
+    catch (e){ skal("Filen er ikke gyldig JSON.", true); return; }
+    const liste = Array.isArray(data) ? data : (data.agenter || data.agents);
+    if (!Array.isArray(liste)){ skal("Fant ingen agentliste i filen.", true); return; }
+    const gyldige = liste.filter(a => a && a.id && a.name);
+    if (!gyldige.length){ skal("Ingen poster hadde både id og navn.", true); return; }
+    if (!confirm("Importere " + gyldige.length + " agenter? Poster med samme id blir overskrevet.")) return;
+    for (const a of gyldige){
+      a.id = slugg(a.id);
+      a.sections = Array.isArray(a.sections) ? a.sections : [];
+      await lagre(a);
+    }
+    skal("Importerte " + gyldige.length + " agenter.");
+  };
+  inn.click();
+}
+async function tilbakestill(){
+  const n = Object.keys(lager.endringer).length;
+  if (!n){ skal("Det finnes ingen endringer å tilbakestille."); return; }
+  if (!confirm("Fjerne alle " + n + " endringer og gå tilbake til katalogversjonen? Dette kan ikke angres.")) return;
+  if (lager.db){
+    for (const id of Object.keys(lager.endringer)){
+      try { await lager.db.doc(COLL + "/" + id).delete(); } catch (e){ /* fortsett */ }
+    }
+  }
+  lager.endringer = {}; lokaltLagre(); tegn();
+  skal("Tilbakestilt til katalogversjonen.");
+}
+
+/* ═══ tema ═════════════════════════════════════════════════════════════ */
+function byttTema(){
+  const na = document.documentElement.getAttribute("data-theme");
+  const morkNa = na ? na === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const nytt = morkNa ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", nytt);
+  try { localStorage.setItem(LS_TEMA, nytt); } catch (e){ /* privat vindu */ }
+}
+try {
+  const t = localStorage.getItem(LS_TEMA);
+  if (t) document.documentElement.setAttribute("data-theme", t);
+} catch (e){ /* privat vindu */ }
+
+/* ═══ oppstart ═════════════════════════════════════════════════════════ */
+lager.endringer = lokaltLese();
+settLagringsmerke();
+tegn();
+
+$("#sok").addEventListener("input", e => { state.sok = e.target.value.trim(); tegnListe(); tegnFiltre(); });
+$("#ny-agent").onclick = () => tegnSkjema(nyAgent(), true);
+$("#duk").onclick = lukk;
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape"){
+    if ($("#meny").classList.contains("apen")){ lukkMeny(); return; }
+    if ($("#panel").classList.contains("apen")) lukk();
+  }
+  if (e.key === "/" && document.activeElement === document.body){ e.preventDefault(); $("#sok").focus(); }
+});
+
+const menyKnapp = $("#meny-knapp"), meny = $("#meny");
+function lukkMeny(){ meny.classList.remove("apen"); menyKnapp.setAttribute("aria-expanded", "false"); }
+menyKnapp.onclick = e => {
+  e.stopPropagation();
+  const apen = meny.classList.toggle("apen");
+  menyKnapp.setAttribute("aria-expanded", apen ? "true" : "false");
+};
+document.addEventListener("click", e => { if (!meny.contains(e.target) && e.target !== menyKnapp) lukkMeny(); });
+$("#m-eksport").onclick = () => { lukkMeny(); eksporter(); };
+$("#m-import").onclick = () => { lukkMeny(); importer(); };
+$("#m-alle-md").onclick = () => { lukkMeny(); alleSomMarkdown(); };
+$("#m-tema").onclick = () => { lukkMeny(); byttTema(); };
+$("#m-tilbakestill").onclick = () => { lukkMeny(); tilbakestill(); };
+
+koblePaDb();
+})();
+</script>
+</body>
+</html>
